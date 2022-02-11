@@ -212,6 +212,7 @@ class Staging(Common):
     """
     DEBUG = False
     
+    ALLOWED_HOSTS = ['quicksos-api.herokuapp.com']
     # Security
     SESSION_COOKIE_SECURE = values.BooleanValue(True)
     SECURE_BROWSER_XSS_FILTER = values.BooleanValue(True)
