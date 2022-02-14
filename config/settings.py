@@ -135,31 +135,7 @@ class Common(Configuration):
     AUTH_USER_MODEL = 'accounts.User'
     
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-    DJOSER = {
-        'LOGIN_FIELD': 'email',
-        'USER_CREATE_PASSWORD_RETYPE': True,
-        'USERNAME_CHANGED_EMAIL_CONFIRMATION':False,
-        'PASSWORD_CHANGED_EMAIL_CONFIRMATION':True,
-        'SEND_ACTIVATION_EMAIL':True,
-        'SEND_CONFIRMATION_EMAIL':True,
-        'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
-        'USERNAME_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
-        'ACTIVATION_URL' : 'activate/{uid}/{token}',
-        'SERIALIZERS':{
-            'user_create': 'accounts.serializers.UserCreateSerializer',
-            'user': 'accounts.serializers.UserCreateSerializer',
-            'user_delete': 'djoser.serializers.UserDeleteSerializer'
-        }
-        
-        
-    }
-
-    REST_FRAMEWORK = {
-        'DEFAULT_AUTHENTICATION_CLASSES': (
-            'rest_framework_simplejwt.authentication.JWTAuthentication',
-        ),
-    }
+    DEFAULT_FROM_EMAIL = "Ade from QUICKSOS"
 
     SIMPLE_JWT = {
         'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
@@ -170,8 +146,6 @@ class Common(Configuration):
         'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
         'ROTATE_REFRESH_TOKENS': True,
         'BLACKLIST_AFTER_ROTATION': True,
-        
-
     }
 
     #Cors headers

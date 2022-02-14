@@ -10,6 +10,7 @@ class WhatsappMessage(models.Model):
     
     name = models.CharField(max_length=300)
     issue = models.TextField()
+    address = models.TextField(null=True,blank=True)
     image_url1 = models.URLField()
     image_url2 = models.URLField(null=True, blank=True)
     status = models.CharField(max_length=300, default="pending", choices=STATUS)

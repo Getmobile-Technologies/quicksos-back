@@ -14,37 +14,32 @@ from .managers import UserManager
 class User(AbstractBaseUser, PermissionsMixin):
     
     ROLE_CHOICES = (
-        ('consignee', 'Consignee'),
-        ('transporter', 'Transporter'),
-        ('clearing_agent', 'Clearing Agent')
+        ('escalator', 'Escalator'),
+        ('agent', 'Agent'),
+        ('first_responder', 'First Responder'),
+        ('admin', "Admin")
     )    
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+2341234567890'. Up to 15 digits allowed.")
     
     
     first_name    = models.CharField(_('first name'),max_length = 250)
     last_name     = models.CharField(_('last name'),max_length = 250)
-    role          = models.CharField(_('role'),max_length = 250, choices=ROLE_CHOICES)
     email         = models.EmailField(_('email'), unique=True)
-    business_name = models.CharField(_('business name'),max_length = 250)
+    gender        = models.CharField(_('gender'),max_length = 250, null=True)
     phone         = models.CharField(_('phone'), max_length = 20, unique = True, validators=[phone_regex])
     address       = models.CharField(_('address'), max_length = 250, null = True)
+    local_gov       = models.CharField(_('local government'), max_length = 250, null = True)
+    role          = models.CharField(_('role'),max_length = 250, choices=ROLE_CHOICES)
     password      = models.CharField(_('password'), max_length=300)
     is_staff      = models.BooleanField(_('staff'), default=False)
     is_admin      = models.BooleanField(_('admin'), default= False)
     is_active     = models.BooleanField(_('active'), default=True)
-    is_deleted    = models.BooleanField(_('delete'), default=False)
     date_joined   = models.DateTimeField(_('date joined'), auto_now_add=True)
     
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 
-                       'last_name', 
-                       'business_name',
-                       'phone', 
-                       'address',
-                       'role',
-                       ]
+    
 
     class Meta:
         verbose_name = _('user')
