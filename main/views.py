@@ -8,7 +8,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 @swagger_auto_schema("post", request_body=MessageSerializer())
 @api_view(["GET","POST"])
-def message(request):
+def add_message(request):
     
     if request.method == "GET":
         return Response({"message":"success"}, status=status.HTTP_200_OK)

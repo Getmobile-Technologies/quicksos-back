@@ -3,5 +3,5 @@ from django.urls import path
 
 
 urlpatterns = [
-    path("message/", views.message)
+    path("message/", views.add_message)
 ]
