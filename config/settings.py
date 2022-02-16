@@ -14,7 +14,7 @@ from configurations import Configuration, values
 from dotenv import load_dotenv, find_dotenv
 from django.utils.timezone import timedelta
 import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegratio
+from sentry_sdk.integrations.django import DjangoIntegration
 
 load_dotenv(find_dotenv())
 
