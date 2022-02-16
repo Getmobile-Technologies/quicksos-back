@@ -7,14 +7,17 @@ from drf_yasg.utils import swagger_auto_schema
 
 
 @swagger_auto_schema("post", request_body=MessageSerializer())
-@api_view(["POST"])
+@api_view(["GET","POST"])
 def message(request):
     
-    serializer = MessageSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        
-        return Response({"message":"success"}, status=status.HTTP_201_CREATED)
-    else:
-        return Response({"error":serializer.errors,"message":"failed"}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == "GET":
+        return Response({"message":"success"}, status=status.HTTP_200_OK)
+    elif request.method == "POST":
+        serializer = MessageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            
+            return Response({"message":"success"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"error":serializer.errors,"message":"failed"}, status=status.HTTP_400_BAD_REQUEST)
     

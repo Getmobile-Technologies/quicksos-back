@@ -51,6 +51,7 @@ class Common(Configuration):
         'drf_yasg',
         'coreapi',
         'corsheaders',
+        'django_rest_passwordreset',
     ]
 
     MIDDLEWARE = [
