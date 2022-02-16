@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from .serializers import MessageSerializer
 from drf_yasg.utils import swagger_auto_schema
-
+from .models import WhatsappMessage
 
 
 @swagger_auto_schema("post", request_body=MessageSerializer())
@@ -11,7 +11,10 @@ from drf_yasg.utils import swagger_auto_schema
 def add_message(request):
     
     if request.method == "GET":
-        return Response({"message":"success"}, status=status.HTTP_200_OK)
+        messages = WhatsappMessage.objects.all()
+        serializer = MessageSerializer(messages, many=True)
+        return Response({"message":"success",
+                         "data":serializer.data}, status=status.HTTP_200_OK)
     elif request.method == "POST":
         serializer = MessageSerializer(data=request.data)
         if serializer.is_valid():
