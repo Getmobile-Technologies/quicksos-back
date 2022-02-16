@@ -13,6 +13,8 @@ from pathlib import Path
 from configurations import Configuration, values
 from dotenv import load_dotenv, find_dotenv
 from django.utils.timezone import timedelta
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegratio
 
 load_dotenv(find_dotenv())
 
@@ -163,6 +165,20 @@ class Common(Configuration):
             }
             }
         }
+    
+    sentry_sdk.init(
+    dsn="https://141d9d2ed6814179842ee3593594ae14@o1037728.ingest.sentry.io/6213553",
+    integrations=[DjangoIntegration()],
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0,
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
 
 class Development(Common):
     """

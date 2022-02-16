@@ -13,8 +13,11 @@ def add_message(request):
     if request.method == "GET":
         messages = WhatsappMessage.objects.all()
         serializer = MessageSerializer(messages, many=True)
-        return Response({"message":"success",
-                         "data":serializer.data}, status=status.HTTP_200_OK)
+        data = {"message":"success",
+                "data":serializer.data}
+        
+        return Response(data,status=status.HTTP_200_OK)
+    
     elif request.method == "POST":
         serializer = MessageSerializer(data=request.data)
         if serializer.is_valid():
