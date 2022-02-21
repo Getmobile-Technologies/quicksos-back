@@ -36,7 +36,7 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
 @receiver(post_save, sender=User)
 def send_details(sender, instance, created, **kwargs):
     if created:
-        print(instance.password)
+        # print(instance.password)
         subject = f"YOUR {instance.role} ACCOUNT FOR QUICKSOS".upper()
         
         message = f"""Hi, {str(instance.first_name).title()}.
@@ -58,7 +58,7 @@ QuickSOS Team.
         
         instance.set_password(instance.password)
         instance.save()
-        print(instance.password)
+        # print(instance.password)
         return
     
     
