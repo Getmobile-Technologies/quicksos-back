@@ -15,7 +15,13 @@ class WhatsappMessage(models.Model):
     image_url2 = models.URLField(null=True, blank=True)
     status = models.CharField(max_length=300, default="pending", choices=STATUS)
     date_created = models.DateTimeField(auto_now_add=True)
+    is_active=models.BooleanField(default=True)
     
     
     def __str__(self) -> str:
         return self.issue
+    
+    
+    def delete(self):
+        self.is_active=False
+        self.save()

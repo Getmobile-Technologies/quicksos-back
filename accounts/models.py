@@ -9,7 +9,9 @@ from django.core.validators import RegexValidator
 from .managers import UserManager
 
 
-
+AUTH_PROVIDERS = {'facebook': 'facebook', 
+                  'google': 'google',  
+                  'email': 'email'}
 
 class User(AbstractBaseUser, PermissionsMixin):
     
@@ -35,6 +37,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_admin      = models.BooleanField(_('admin'), default= False)
     is_active     = models.BooleanField(_('active'), default=True)
     date_joined   = models.DateTimeField(_('date joined'), auto_now_add=True)
+    auth_provider = models.CharField(
+        max_length=255, blank=False,
+        null=False, default=AUTH_PROVIDERS.get('email'))
     
     objects = UserManager()
 
@@ -49,7 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
     
     def delete(self):
-        self.is_deleted = True
+        self.is_active = False
         self.save()
 
 
