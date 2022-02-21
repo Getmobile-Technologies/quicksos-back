@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4d41188b11f5bc16033c65c14e8a73506fa4b14458abaa3a7f240ae86b0c0bf0"
+            "sha256": "fa7845362aad178db23e4e3be66e3f88c7cbde8833e070e6d05b87e86ca25be7"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -88,6 +88,13 @@
             ],
             "index": "pypi",
             "version": "==2.0.4"
+        },
+        "cloudinary": {
+            "hashes": [
+                "sha256:f436ef3ddb2b3989199afaf82bc50655b187bf1ae98c4bf0bb3eb63055953466"
+            ],
+            "index": "pypi",
+            "version": "==1.29.0"
         },
         "coreapi": {
             "hashes": [
