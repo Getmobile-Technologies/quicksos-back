@@ -58,3 +58,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.save()
 
 
+
+class FirstResponder(models.Model):
+    orgranization = models.CharField(max_length=255, unique=True)
+    address = models.CharField(max_length=500)
+    is_active     = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.orgranization
+    
+    def delete(self):
+        self.is_active = False
+        self.save()

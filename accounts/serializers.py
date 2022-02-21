@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=300, required=False,allow_blank=True)
+    password = serializers.CharField(max_length=300, required=False,allow_blank=True, write_only=True)
     class Meta():
         model = User
         fields = '__all__'
@@ -27,3 +27,6 @@ class ChangePasswordSerializer(serializers.Serializer):
         if self.validated_data['new_password'] != self.validated_data['confirm_password']:
             raise serializers.ValidationError({"error":"Please enter matching passwords"})
         return True
+    
+    
+# class AddFirstResponder
