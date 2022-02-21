@@ -15,7 +15,8 @@ from dotenv import load_dotenv, find_dotenv
 from django.utils.timezone import timedelta
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
-
+import cloudinary
+ 
 load_dotenv(find_dotenv())
 
 class Common(Configuration):
@@ -138,7 +139,7 @@ class Common(Configuration):
     AUTH_USER_MODEL = 'accounts.User'
     
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    DEFAULT_FROM_EMAIL = "Ade from QUICKSOS"
+    DEFAULT_FROM_EMAIL = "Ade from QUICKSOS <hello@getmobile.tech>"
 
     SIMPLE_JWT = {
         'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
@@ -179,6 +180,12 @@ class Common(Configuration):
     # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True
 )
+    #CLOUDINARY FILE UPLOADS
+    cloudinary.config(
+        cloud_name = os.getenv('CLOUD_NAME'),
+        api_key = os.getenv('CLOUD_API_KEY'),
+        api_secret = os.getenv('CLOUD_API_SECRET')
+    )
 
 class Development(Common):
     """
@@ -216,6 +223,13 @@ class Staging(Common):
     SECURE_PROXY_SSL_HEADER = values.TupleValue(
         ('HTTP_X_FORWARDED_PROTO', 'https')
     )
+    
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmass.co'
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+    EMAIL_PORT = 25 
+    EMAIL_USE_TLS = True    # use port 587
 
 
 class Production(Staging):

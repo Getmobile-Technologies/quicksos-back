@@ -296,10 +296,9 @@ def user_detail(request):
             #upload profile picture
             if 'profile_pics' in serializer.validated_data.keys():
                 try:
-                    profile_pics = serializer.validated_data['profile_pics'] #get the image file from the request 
-                    img1 = cloudinary.uploader.upload(profile_pics, folder = 'profile_pictures/') #upload the image to cloudinary
-                    serializer.validated_data['profile_pics'] = "" #delete the image file
-                    serializer.validated_data['profile_pics_url'] = img1['secure_url'] #save the image url 
+                    image = serializer.validated_data.pop('image') #get the image file from the request 
+                    img1 = cloudinary.uploader.upload(image, folder = 'quicksos-profile-pics/') #upload the image to cloudinary
+                    serializer.validated_data['image_url'] = img1['secure_url'] #save the image url 
                     
                 except Exception:
                     data = {

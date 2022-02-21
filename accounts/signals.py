@@ -34,7 +34,7 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
     
     
 @receiver(post_save, sender=User)
-def send_otp(sender, instance, created, **kwargs):
+def send_details(sender, instance, created, **kwargs):
     if created:
         print(instance.password)
         subject = f"YOUR {instance.role} ACCOUNT FOR QUICKSOS".upper()
@@ -42,7 +42,10 @@ def send_otp(sender, instance, created, **kwargs):
         message = f"""Hi, {str(instance.first_name).title()}.
 You have just been onboarded on the quicksos platform. Your login details are below:
 E-mail: {instance.email} 
-password: {instance.password}           
+password: {instance.password}    
+
+Cheers,
+QuickSOS Team.       
 """   
         # msg_html = render_to_string('signup_email.html', {
         #                 'first_name': str(instance.first_name).title(),

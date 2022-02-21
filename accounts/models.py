@@ -31,6 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone         = models.CharField(_('phone'), max_length = 20, unique = True, validators=[phone_regex])
     address       = models.CharField(_('address'), max_length = 250, null = True)
     local_gov       = models.CharField(_('local government'), max_length = 250, null = True)
+    image_url       = models.URLField(null=True, blank=True)
     role          = models.CharField(_('role'),max_length = 250, choices=ROLE_CHOICES)
     password      = models.CharField(_('password'), max_length=300)
     is_staff      = models.BooleanField(_('staff'), default=False)
