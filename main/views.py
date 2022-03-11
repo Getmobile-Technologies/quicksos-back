@@ -1,13 +1,13 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
-from .serializers import EscalatorSerializer, MessageSerializer
+from .serializers import EscalateSerializer, EscalatorSerializer, MessageSerializer
 from drf_yasg.utils import swagger_auto_schema
 from .models import Escalator, Message
 from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-from accounts.permissions import IsAdmin
+from accounts.permissions import IsAdmin, IsAgent
 
 
 @swagger_auto_schema("post", request_body=MessageSerializer())
@@ -161,6 +161,11 @@ def escalator_detail(request, escalator_id):
         return Response(data, status=status.HTTP_204_NO_CONTENT)
     
 
+
+@swagger_auto_schema("post", request_body=EscalateSerializer())
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAgent])
+@api_view(['POST'])
 def escalate(request, message_id):
     try:
         obj = Message.objects.get(id=message_id, is_active=True, status="pending")
@@ -168,13 +173,19 @@ def escalate(request, message_id):
     except Message.DoesNotExist:
         errors = {
                 "message":"failed",
-                "errors": f'Report with id {message_id} not found'
+                "errors": f'Message with id {message_id} not found'
                 }
         return Response(errors, status=status.HTTP_404_NOT_FOUND)
     
-    obj.status="escalated"
-    obj.save()
-    
-    return Response({"message":"successful"}, status=status.HTTP_204_NO_CONTENT)
+    if request.method == "POST":
+        
+        serializer = EscalateSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            obj.escalators.set(serializer.validated_data['escalators'])
+            obj.status="escalated"
+            obj.save()
+        
+        return Response({"message":"successful"}, status=status.HTTP_204_NO_CONTENT)
     
     

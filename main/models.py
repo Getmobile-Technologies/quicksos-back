@@ -2,33 +2,6 @@ from django.db import models
 import uuid
 # Create your models here.
 
-class Message(models.Model):
-    STATUS = (("pending", "Pending"),
-              ("escalated", "Escalated"),
-              ("assigned", "Assigned"),
-              ("completed", "Completed")
-              )
-    
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-    name = models.CharField(max_length=300)
-    issue = models.TextField()
-    address = models.TextField(null=True,blank=True)
-    image_url1 = models.URLField()
-    image_url2 = models.URLField(null=True, blank=True)
-    status = models.CharField(max_length=300, default="pending", choices=STATUS)
-    date_created = models.DateTimeField(auto_now_add=True)
-    is_active=models.BooleanField(default=True)
-    
-    
-    def __str__(self) -> str:
-        return self.issue
-    
-    
-    def delete(self):
-        self.is_active=False
-        self.save()
-        
-        
 class Escalator(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(unique=True, max_length=255)
@@ -47,5 +20,35 @@ class Escalator(models.Model):
         self.members.save()
         
         return
+    
+class Message(models.Model):
+    STATUS = (("pending", "Pending"),
+              ("escalated", "Escalated"),
+              ("assigned", "Assigned"),
+              ("completed", "Completed")
+              )
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    name = models.CharField(max_length=300)
+    issue = models.TextField()
+    address = models.TextField(null=True,blank=True)
+    image_url1 = models.URLField()
+    image_url2 = models.URLField(null=True, blank=True)
+    status = models.CharField(max_length=300, default="pending", choices=STATUS)
+    escalators =  models.ManyToManyField(Escalator, related_name="messages")
+    date_created = models.DateTimeField(auto_now_add=True)
+    is_active=models.BooleanField(default=True)
+    
+    
+    def __str__(self) -> str:
+        return self.issue
+    
+    
+    def delete(self):
+        self.is_active=False
+        self.save()
+        
+        
+
     
         
