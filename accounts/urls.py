@@ -7,7 +7,7 @@ urlpatterns = [
     path("users/agents/", views.get_agents),
     path("users/escalators/", views.get_escalators),
     path("users/profile/", views.user_detail),
-    path("users/<int:user_id>/", views.get_user_detail),
+    path("users/<uuid:user_id>/", views.get_user_detail),
     path("users/auth/", views.user_login),
     path("users/reset_password/", views.reset_password),
     
