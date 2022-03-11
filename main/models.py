@@ -49,25 +49,6 @@ class Message(models.Model):
         self.save()
         
 
-# class Report(models.Model):
-#     responder = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reports")
-#     case = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="reports")
-#     situation_report = models.TextField(null=True, blank=True)
-#     image_url1 = models.URLField()
-#     image_url2 = models.URLField(null=True, blank=True)
-#     status = models.CharField(default="pending")
-#     date_created = models.DateTimeField(auto_now_add=True)
-#     is_active=models.BooleanField(default=True)
-    
-    
-#     def __str__(self) -> str:
-#         return self.case
-    
-    
-#     def delete(self):
-#         self.is_active=False
-#         self.save()
-    
 
     
         

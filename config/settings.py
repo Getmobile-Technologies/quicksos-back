@@ -45,7 +45,7 @@ class Common(Configuration):
         #local apps
         'accounts',
         "main",
-        
+        "report",
         ### third party
         'rest_framework',
         'django_extensions',

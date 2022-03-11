@@ -22,7 +22,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('agent', 'Agent'),
         ('first_responder', 'First Responder'),
         ('admin', "Admin")
-    )    
+    )
+       
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+2341234567890'. Up to 15 digits allowed.")
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
