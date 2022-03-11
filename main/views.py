@@ -7,7 +7,7 @@ from .models import Escalator, Message
 from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-from accounts.permissions import IsAdmin, IsAgent
+from accounts.permissions import IsAdmin, IsAgent, IsEscalator
 
 
 @swagger_auto_schema("post", request_body=MessageSerializer())
@@ -26,7 +26,7 @@ def add_message(request):
 
 @api_view(["GET"])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAgent])
 def get_message(request):        
     if request.method == "GET":
         messages = Message.objects.filter(is_active=True)
@@ -39,7 +39,7 @@ def get_message(request):
     
 @api_view(["GET"])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAgent])
 def message_detail(request, message_id):
     try:
         obj = Message.objects.get(id=message_id, is_active=True)
@@ -89,7 +89,7 @@ def message_detail(request, message_id):
 @swagger_auto_schema("post", request_body=EscalatorSerializer())
 @api_view(["GET", "POST"])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAdmin])
 def escalators(request):
     
     if request.method == "GET":
@@ -114,7 +114,7 @@ def escalators(request):
     
 @api_view(["GET"])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAdmin])
 def escalator_detail(request, escalator_id):
     try:
         obj = Escalator.objects.get(id=escalator_id, is_active=True)
@@ -173,7 +173,7 @@ def escalate(request, message_id):
     except Message.DoesNotExist:
         errors = {
                 "message":"failed",
-                "errors": f'Message with id {message_id} not found'
+                "errors": f'Message with id {message_id} not found or has been escalated'
                 }
         return Response(errors, status=status.HTTP_404_NOT_FOUND)
     
@@ -188,4 +188,15 @@ def escalate(request, message_id):
         
         return Response({"message":"successful"}, status=status.HTTP_204_NO_CONTENT)
     
-    
+
+@api_view(["GET"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsEscalator])
+def escalated_message(request):        
+    if request.method == "GET":
+        messages = Message.objects.filter(is_active=True, status="escalated",escalators=request.user.escalator )
+        serializer = MessageSerializer(messages, many=True)
+        data = {"message":"success",
+                "data":serializer.data}
+        
+        return Response(data,status=status.HTTP_200_OK)

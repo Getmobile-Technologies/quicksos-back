@@ -35,9 +35,10 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
     
 @receiver(post_save, sender=User)
 def send_details(sender, instance, created, **kwargs):
-    if created:
+    if created and instance.is_superuser==False:
         # print(instance.password)
-        subject = f"YOUR {instance.role} ACCOUNT FOR QUICKSOS".upper()
+        role = " ".join(str(instance.role).split('_'))
+        subject = f"YOUR {role} ACCOUNT FOR QUICKSOS".upper()
         
         message = f"""Hi, {str(instance.first_name).title()}.
 You have just been onboarded on the quicksos platform. Your login details are below:

@@ -1,6 +1,6 @@
 import random
 import string
-from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied, ValidationError
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view, authentication_classes, permission_classes 
@@ -46,9 +46,20 @@ def add_admin(request):
                     "message":"You do not have permission to add another admin"
                 }) 
             
+               
+            if (role == "escalator" or role=="first_responder"):
+                if "escalator" not in serializer.validated_data.keys(): 
+                    raise ValidationError(detail={
+                        "message":"You must add an escalator to these accounts"
+                    }) 
+                if serializer.validated_data['escalator'] is None:
+                    raise ValidationError(detail={
+                        "message":"You must add an escalator to these accounts"
+                    }) 
 
             
             serializer.validated_data['password'] = generate_password() 
+            serializer.validated_data['is_active']=True
             serializer.save()
             
             data = {

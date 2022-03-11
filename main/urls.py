@@ -9,5 +9,6 @@ urlpatterns = [
     path("messages/<uuid:message_id>/", views.message_detail),
     path("escalators/", views.escalators),
     path("escalators/<uuid:escalator_id>/", views.escalator_detail),
+    path("escalators/escalated/", views.escalated_message)
     
 ]
