@@ -139,12 +139,17 @@ def get_escalators(request):
 
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAdmin])
-def get_escalators(request):
+@permission_classes([IsAuthenticated])
+def get_responders(request):
     
     """Allows the admin to see all escalators  """
     if request.method == 'GET':
-        users = User.objects.filter(is_active=True, role="first_responder")
+        if request.user.role=="escalator":
+           users = User.objects.filter(is_active=True, role="first_responder", escalator=request.user.escalator) 
+        elif request.role=="admin":
+            users = User.objects.filter(is_active=True, role="first_responder")
+        else:
+            raise PermissionDenied({"message":"You do not have the permission to view this."})
     
         
         serializer = UserSerializer(users, many =True)

@@ -7,7 +7,7 @@ from .models import Escalator, Message
 from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-from accounts.permissions import IsAdmin, IsAgent, IsEscalator
+from accounts.permissions import IsAdmin, IsAdminOrReadOnly, IsAgent, IsEscalator
 
 
 @swagger_auto_schema("post", request_body=MessageSerializer())
@@ -89,7 +89,7 @@ def message_detail(request, message_id):
 @swagger_auto_schema("post", request_body=EscalatorSerializer())
 @api_view(["GET", "POST"])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAdmin])
+@permission_classes([IsAdminOrReadOnly])
 def escalators(request):
     
     if request.method == "GET":
