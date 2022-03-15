@@ -146,7 +146,7 @@ def get_responders(request):
     if request.method == 'GET':
         if request.user.role=="escalator":
            users = User.objects.filter(is_active=True, role="first_responder", escalator=request.user.escalator) 
-        elif request.role=="admin":
+        elif request.user.role=="admin":
             users = User.objects.filter(is_active=True, role="first_responder")
         else:
             raise PermissionDenied({"message":"You do not have the permission to view this."})
