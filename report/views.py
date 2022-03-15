@@ -19,6 +19,10 @@ def assign(request):
         serializer = ReportSerializer(data=request.data)
         
         if serializer.is_valid():
+            message = serializer.validated_data['case']
+            message.status = "assigned"
+            message.save()
+            
             serializer.save()
             
             data = {
