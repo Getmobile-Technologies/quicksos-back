@@ -7,8 +7,8 @@ urlpatterns = [
     path("messages/get", views.get_message),
     path("messages/<uuid:message_id>/escalate/", views.escalate),
     path("messages/<uuid:message_id>/", views.message_detail),
-    path("escalators/", views.escalators),
-    path("escalators/<uuid:escalator_id>/", views.escalator_detail),
-    path("escalators/escalated/", views.escalated_message)
+    path("agencies/", views.agencies),
+    path("agencies/<uuid:agency_id>/", views.agency_detail),
+    path("agencies/escalated/", views.escalated_message)
     
 ]

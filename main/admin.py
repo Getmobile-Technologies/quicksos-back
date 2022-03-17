@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import Message, Escalator
+from .models import Message, Agency
 # Register your models here.
 
 
-admin.site.register([Message, Escalator])
+admin.site.register([Message, Agency])

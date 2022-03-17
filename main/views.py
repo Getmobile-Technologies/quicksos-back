@@ -1,9 +1,9 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
-from .serializers import EscalateSerializer, EscalatorSerializer, MessageSerializer
+from .serializers import EscalateSerializer, AgencySerializer, MessageSerializer
 from drf_yasg.utils import swagger_auto_schema
-from .models import Escalator, Message
+from .models import Agency, Message
 from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -86,22 +86,22 @@ def message_detail(request, message_id):
         return Response(data, status=status.HTTP_204_NO_CONTENT)
 
 
-@swagger_auto_schema("post", request_body=EscalatorSerializer())
+@swagger_auto_schema("post", request_body=AgencySerializer())
 @api_view(["GET", "POST"])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAdminOrReadOnly])
-def escalators(request):
+def agencies(request):
     
     if request.method == "GET":
-        escalators = Escalator.objects.filter(is_active=True)
-        serializer = EscalatorSerializer(escalators, many=True)
+        agency = Agency.objects.filter(is_active=True)
+        serializer = AgencySerializer(agency, many=True)
         data = {"message":"success",
                 "data":serializer.data}
         
         return Response(data,status=status.HTTP_200_OK)
     
     elif request.method == "POST":
-        serializer = EscalatorSerializer(data=request.data)
+        serializer = AgencySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             
@@ -115,18 +115,18 @@ def escalators(request):
 @api_view(["GET"])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAdmin])
-def escalator_detail(request, escalator_id):
+def agency_detail(request, agency_id):
     try:
-        obj = Escalator.objects.get(id=escalator_id, is_active=True)
+        obj = Agency.objects.get(id=agency_id, is_active=True)
     except Message.DoesNotExist:
         errors = {
                 "message":"failed",
-                "errors": f'Escalator with id {escalator_id} not found'
+                "errors": f'Agency with id {agency_id} not found'
                 }
         return Response(errors, status=status.HTTP_404_NOT_FOUND)
     
     if request.method == 'GET':
-        serializer =EscalatorSerializer(obj)
+        serializer =AgencySerializer(obj)
         data = {
                 "message":"success",
                 "data":serializer.data
@@ -136,7 +136,7 @@ def escalator_detail(request, escalator_id):
         
     
     elif request.method == 'PUT':
-        serializer = EscalatorSerializer(obj, data=request.data, partial=True)
+        serializer = AgencySerializer(obj, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             data = {

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Escalator, Message
+from .models import Agency, Message
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -9,10 +9,10 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
         
-class EscalatorSerializer(serializers.ModelSerializer):
+class AgencySerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = Escalator
+        model = Agency
         fields = '__all__'
         
         
@@ -20,4 +20,4 @@ class EscalateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Message
-        fields = ['escalators']
+        fields = ['agencies']
