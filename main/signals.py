@@ -42,7 +42,7 @@ QuickSOS Team.
         recipient_list = get_data(escalators)
         send_mail( subject, message, email_from, recipient_list)
         
-        print(recipient_list)
+        # print(recipient_list)
         # print(instance.password)
         return
     

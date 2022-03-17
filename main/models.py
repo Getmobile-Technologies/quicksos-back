@@ -28,15 +28,22 @@ class Message(models.Model):
               ("completed", "Completed")
               )
     
+    PROVIDERS = (("whatsapp", "Whatsapp"), 
+                 ("web", "Web"))
+    
+    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=300)
+    category = models.CharField(max_length=300, null=True, blank=True)
     issue = models.TextField()
     address = models.TextField(null=True,blank=True)
     image_url1 = models.URLField()
     image_url2 = models.URLField(null=True, blank=True)
     status = models.CharField(max_length=300, default="pending", choices=STATUS)
     agencies =  models.ManyToManyField(Agency, related_name="messages", blank=True)
+    agent_note = models.TextField(blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
+    provider = models.CharField(max_length=255, default="whatsapp", choices=PROVIDERS)
     is_active=models.BooleanField(default=True)
     
     
