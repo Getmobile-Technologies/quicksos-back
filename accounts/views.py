@@ -48,9 +48,9 @@ def add_admin(request):
             
                
             if (role == "escalator" or role=="first_responder"):
-                if "escalator" not in serializer.validated_data.keys(): 
+                if "agency" not in serializer.validated_data.keys(): 
                     raise ValidationError(detail={
-                        "message":"You must add an escalator to these accounts"
+                        "message":"You must add an agency for this account."
                     }) 
                 if serializer.validated_data['escalator'] is None:
                     raise ValidationError(detail={
@@ -145,7 +145,7 @@ def get_responders(request):
     """Allows the admin to see all escalators  """
     if request.method == 'GET':
         if request.user.role=="escalator":
-           users = User.objects.filter(is_active=True, role="first_responder", escalator=request.user.escalator) 
+           users = User.objects.filter(is_active=True, role="first_responder", agency=request.user.agency) 
         elif request.user.role=="admin":
             users = User.objects.filter(is_active=True, role="first_responder")
         else:
