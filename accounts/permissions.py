@@ -68,3 +68,14 @@ class IsAdminOrReadOnly(BasePermission):
         else:
             raise AuthenticationFailed(detail="Authentication credentials were not provided")
         
+        
+class IsAgentOrAdmin(BasePermission):
+    """
+    Allows access only to admin users.
+    """
+
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
+            return bool(request.user and request.user.role == 'agent') or bool(request.user and request.user.role == 'admin') 
+        else:
+            raise AuthenticationFailed(detail="Authentication credentials were not provided")
