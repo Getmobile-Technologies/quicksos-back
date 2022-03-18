@@ -193,7 +193,7 @@ def escalate(request, message_id):
         serializer = EscalateSerializer(data=request.data)
         
         if serializer.is_valid():
-            obj.escalators.set(serializer.validated_data['escalators'])
+            obj.agencies.set(serializer.validated_data['agencies'])
             obj.status="escalated"
             obj.save()
         
