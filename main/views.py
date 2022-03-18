@@ -36,6 +36,17 @@ def get_message(request):
         
         return Response(data,status=status.HTTP_200_OK)
     
+@api_view(["GET"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAgent])
+def peding_message(request):        
+    if request.method == "GET":
+        messages = Message.objects.filter(is_active=True, status = "pending")
+        serializer = MessageSerializer(messages, many=True)
+        data = {"message":"success",
+                "data":serializer.data}
+        
+        return Response(data,status=status.HTTP_200_OK)
     
 @api_view(["GET"])
 @authentication_classes([JWTAuthentication])

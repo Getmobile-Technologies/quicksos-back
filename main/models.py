@@ -29,7 +29,7 @@ class Message(models.Model):
               )
     
     PROVIDERS = (("whatsapp", "Whatsapp"), 
-                 ("web", "Web"))
+                 ("call", "call"))
     
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)

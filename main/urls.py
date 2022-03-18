@@ -4,7 +4,8 @@ from django.urls import path
 
 urlpatterns = [
     path("messages/", views.add_message),
-    path("messages/get", views.get_message),
+    path("messages/all", views.get_message),
+    path("messages/pending", views.get_message),
     path("messages/<uuid:message_id>/escalate/", views.escalate),
     path("messages/<uuid:message_id>/", views.message_detail),
     path("agencies/", views.agencies),
