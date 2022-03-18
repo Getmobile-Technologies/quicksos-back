@@ -174,18 +174,18 @@ def agency_detail(request, agency_id):
 
 
 @swagger_auto_schema("post", request_body=EscalateSerializer())
-# @authentication_classes([JWTAuthentication])
-# @permission_classes([IsAgent])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAgent])
 @api_view(['POST'])
-def escalate(request):
+def escalate(request, message_id):
     try:
-        # obj = Message.objects.get(id=message_id, is_active=True, status="pending")
-        obj = Message.objects.first()
+        obj = Message.objects.get(id=message_id, is_active=True, status="pending")
+    
         
     except Message.DoesNotExist:
         errors = {
                 "message":"failed",
-                "errors": 'Message with id {message_id} not found or has been escalated'
+                "errors": f'Message with id {message_id} not found or has been escalated'
                 }
         return Response(errors, status=status.HTTP_404_NOT_FOUND)
     
