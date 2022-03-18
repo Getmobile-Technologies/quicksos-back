@@ -26,9 +26,14 @@ class EscalateSerializer(serializers.ModelSerializer):
         
     def validate(self, attrs):
         err = {}
+        error = False
         if  attrs.get('agent_note') is None or len(attrs.get('agent_note')) <= 0:
             err['agencies'] = "Please add agencies you want to escalate to."
         if attrs.get('agent_note') == "" or attrs.get('agent_note')  is None:
             err["agent_note"] = "Please add note for escalators"
         
-        raise ValidationError(err)
+        if error == True:
+            
+            raise ValidationError(err)
+        else:
+            return attrs
