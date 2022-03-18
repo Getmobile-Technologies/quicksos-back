@@ -174,17 +174,18 @@ def agency_detail(request, agency_id):
 
 
 @swagger_auto_schema("post", request_body=EscalateSerializer())
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAgent])
+# @authentication_classes([JWTAuthentication])
+# @permission_classes([IsAgent])
 @api_view(['POST'])
-def escalate(request, message_id):
+def escalate(request):
     try:
-        obj = Message.objects.get(id=message_id, is_active=True, status="pending")
+        # obj = Message.objects.get(id=message_id, is_active=True, status="pending")
+        obj = Message.objects.first()
         
     except Message.DoesNotExist:
         errors = {
                 "message":"failed",
-                "errors": f'Message with id {message_id} not found or has been escalated'
+                "errors": 'Message with id {message_id} not found or has been escalated'
                 }
         return Response(errors, status=status.HTTP_404_NOT_FOUND)
     
@@ -193,12 +194,18 @@ def escalate(request, message_id):
         serializer = EscalateSerializer(data=request.data)
         
         if serializer.is_valid():
+            
             obj.agencies.set(serializer.validated_data['agencies'])
             obj.status="escalated"
             obj.save()
         
-        return Response({"message":"successful"}, status=status.HTTP_204_NO_CONTENT)
-    
+            return Response({"message":"successful"}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            errors = {
+                "message":"failed",
+                "errors":serializer.errors
+                }
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET"])
 @authentication_classes([JWTAuthentication])
