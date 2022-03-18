@@ -54,7 +54,7 @@ def add_admin(request):
                     }) 
                 if serializer.validated_data['agency'] is None:
                     raise ValidationError(detail={
-                        "message":"You must add an escalator to these accounts"
+                        "message":"You must add an agency for this account."
                     }) 
 
             
