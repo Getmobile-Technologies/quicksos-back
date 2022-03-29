@@ -211,7 +211,7 @@ def escalate(request, message_id):
 @permission_classes([IsEscalator])
 def escalated_message(request):        
     if request.method == "GET":
-        messages = Message.objects.filter(is_active=True, status="escalated",escalators=request.user.agency )
+        messages = Message.objects.filter(is_active=True, status="escalated",agencies=request.user.agency )
         serializer = MessageSerializer(messages, many=True)
         data = {"message":"success",
                 "data":serializer.data}

@@ -22,7 +22,7 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
     #                     'first_name': str(instance.user.first_name).title(),
     #                     'code':code})
     
-    message= 'Hello {},\n\nYou are receiving this message because you or someone else have requested the reset of the password for your account.\nKindly follow tis link or copy it to your browser to change your password:\n{}\n\nPlease if you did not request this please ignore this e-mail and your password would remain unchanged.\n\nRegards,\nQuick SOS Support'.format(instance.user.first_name, token)
+    message= 'Hello {},\n\nYou are receiving this message because you or someone else have requested the reset of the password for your account.\nKindly follow tis link or copy it to your browser to change your password:\n{}\n\nPlease if you did not request this please ignore this e-mail and your password would remain unchanged.\n\nRegards,\nQuick SOS Support'.format(instance.first_name, token)
     
     send_mail(
         subject = "RESET PASSWORD OTP FOR QUICK SOS",
@@ -55,7 +55,7 @@ QuickSOS Team.
         
         email_from = settings.Common.DEFAULT_FROM_EMAIL
         recipient_list = [instance.email]
-        send_mail( subject, message, email_from, recipient_list)
+        send_mail(subject, message, email_from, recipient_list)
         
         instance.set_password(instance.password)
         instance.save()
