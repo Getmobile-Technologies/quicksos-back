@@ -6,8 +6,6 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import RegexValidator
 
-from main.models import Agency
-
 from .managers import UserManager
 import uuid
 
@@ -36,7 +34,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     local_gov       = models.CharField(_('local government'), max_length = 250, null = True)
     image_url       = models.URLField(null=True, blank=True)
     role          = models.CharField(_('role'),max_length = 250, choices=ROLE_CHOICES)
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE, related_name="members", null=True)
+    agency = models.ForeignKey('main.Agency', on_delete=models.CASCADE, related_name="members", null=True)
     password      = models.CharField(_('password'), max_length=300)
     is_staff      = models.BooleanField(_('staff'), default=False)
     is_admin      = models.BooleanField(_('admin'), default= False)

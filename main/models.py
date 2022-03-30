@@ -1,7 +1,9 @@
 from django.db import models
 import uuid
+from django.contrib.auth import get_user_model
 # Create your models here.
 
+User = get_user_model()
 class Agency(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(unique=True, max_length=255)
@@ -40,6 +42,7 @@ class Message(models.Model):
     image_url1 = models.URLField()
     image_url2 = models.URLField(null=True, blank=True)
     status = models.CharField(max_length=300, default="pending", choices=STATUS)
+    agent = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     agencies =  models.ManyToManyField(Agency, related_name="messages", blank=True)
     agent_note = models.TextField(blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)

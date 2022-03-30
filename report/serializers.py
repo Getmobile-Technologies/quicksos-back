@@ -1,10 +1,19 @@
 from rest_framework import serializers
-from .models import Report
+from .models import AssignedCase, Report
 
 
-class ReportSerializer(serializers.ModelSerializer):
+class AssignedCaseSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = Report
+        model = AssignedCase
         fields = '__all__'
         
+        
+class ReportSerializer(serializers.ModelSerializer):
+    img1 = serializers.ImageField()
+    img2 = serializers.ImageField(required=False)
+    mark_complete = serializers.BooleanField()
+    
+    class Meta:
+        model=Report
+        fields = '__all__'

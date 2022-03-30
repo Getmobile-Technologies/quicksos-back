@@ -1,3 +1,4 @@
+from django.forms import model_to_dict
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -195,6 +196,7 @@ def escalate(request, message_id):
         
         if serializer.is_valid():
             obj.agencies.set(serializer.validated_data['agencies'])
+            obj.agent = request.user
             obj.status="escalated"
             obj.save()
         
@@ -215,5 +217,30 @@ def escalated_message(request):
         serializer = MessageSerializer(messages, many=True)
         data = {"message":"success",
                 "data":serializer.data}
+        
+        return Response(data,status=status.HTTP_200_OK)
+    
+    
+
+@api_view(["GET"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def message_report(request, message_id):        
+    if request.method == "GET":
+        message = Message.objects.filter(is_active=True, id=message_id)
+        data_ = [{"first_responder": model_to_dict(case.responder,
+                                                  exclude=['password',
+                                                          'groups',
+                                                          'user_permissions',
+                                                          'agency',
+                                                          'last_login']),
+                 "agency":model_to_dict(case.responder.agency),
+                 "escalator_note": case.escalator_note, 
+                 "status":case.status, 
+                 'reports':case.report_detail 
+                 } for case in message.assigned.all()]
+        
+        data = {"message":"success",
+                "data":data_}
         
         return Response(data,status=status.HTTP_200_OK)
