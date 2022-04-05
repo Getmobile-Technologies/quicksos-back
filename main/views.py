@@ -227,20 +227,27 @@ def escalated_message(request):
 @permission_classes([IsAuthenticated])
 def message_report(request, message_id):        
     if request.method == "GET":
-        message = Message.objects.filter(is_active=True, id=message_id)
-        data_ = [{"first_responder": model_to_dict(case.responder,
-                                                  exclude=['password',
-                                                          'groups',
-                                                          'user_permissions',
-                                                          'agency',
-                                                          'last_login']),
-                 "agency":model_to_dict(case.responder.agency),
-                 "escalator_note": case.escalator_note, 
-                 "status":case.status, 
-                 'reports':case.report_detail 
-                 } for case in message.assigned.all()]
-        
-        data = {"message":"success",
-                "data":data_}
-        
-        return Response(data,status=status.HTTP_200_OK)
+        try:
+            message = Message.objects.get(is_active=True, id=message_id)
+            data_ = [{"first_responder": model_to_dict(case.responder,
+                                                    exclude=['password',
+                                                            'groups',
+                                                            'user_permissions',
+                                                            'agency',
+                                                            'last_login']),
+                    "agency":model_to_dict(case.responder.agency),
+                    "escalator_note": case.escalator_note, 
+                    "status":case.status, 
+                    'reports':case.report_detail 
+                    } for case in message.assigned.all()]
+            
+            data = {"message":"success",
+                    "data":data_}
+            
+            return Response(data,status=status.HTTP_200_OK)
+        except Message.DoesNotExist:
+            errors = {
+                    "message":"failed",
+                    "errors": f'Message not found'
+                    }
+            return Response(errors, status=status.HTTP_404_NOT_FOUND)
