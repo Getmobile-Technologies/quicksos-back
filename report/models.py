@@ -17,7 +17,7 @@ class AssignedCase(models.Model):
     
     
     def __str__(self) -> str:
-        return self.case
+        return f"{self.case.name} -- {self.responder.agency.acronym}"
     
     @property
     def report_detail(self):
