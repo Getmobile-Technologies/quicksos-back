@@ -40,7 +40,7 @@ class Report(models.Model):
     
     
     def __str__(self) -> str:
-        return self.case
+        return self.assigned_case.responder.agency.acronym
     
     
     def delete(self):
