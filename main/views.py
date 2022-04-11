@@ -200,7 +200,7 @@ def escalate(request, message_id):
             obj.status= "escalated"
             obj.save()
         
-            return Response({"message":"successful"}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"message":"successful"}, status=status.HTTP_201_CREATED)
         else:
             errors = {
                 "message":"failed",
