@@ -55,7 +55,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('users')
 
     def __str__(self):
-        return f'{self.email} -- {self.role} -- {self.agency.acronym}'
+        agency = f'-- {self.agency.acronym}' if self.acronym else ""
+        return f'{self.email} -- {self.role}' + agency
     
     def delete(self):
         self.is_active = False
