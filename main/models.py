@@ -11,7 +11,7 @@ class Agency(models.Model):
     is_active= models.BooleanField(default=True)
     date_added = models.DateTimeField(auto_now_add=True)
 
-     class Meta:
+    class Meta:
         ordering = ["-date_added"]
     
     def __str__(self) -> str:
@@ -53,9 +53,9 @@ class Message(models.Model):
     is_active=models.BooleanField(default=True)
     
     
-     class Meta:
+    class Meta:
         ordering = ["-date_created"]
-        
+
     def __str__(self) -> str:
         return self.issue
     

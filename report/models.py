@@ -16,6 +16,9 @@ class AssignedCase(models.Model):
     is_active=models.BooleanField(default=True)
     
     
+    class Meta:
+        ordering = ["-date_created"]
+    
     def __str__(self) -> str:
         return f"{self.case.name} -- {self.responder.agency.acronym}"
     
@@ -29,8 +32,6 @@ class AssignedCase(models.Model):
         self.reports.all().update(is_active=False)
 
     
-    class Meta:
-        ordering = ["-date_created"]
     
 
 class Report(models.Model):
