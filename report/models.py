@@ -29,8 +29,8 @@ class AssignedCase(models.Model):
         self.reports.all().update(is_active=False)
 
     
-    # class Meta:
-    #     ordering = ["-date_created"]
+    class Meta:
+        ordering = ["-date_created"]
     
 
 class Report(models.Model):
@@ -42,8 +42,8 @@ class Report(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     is_active=models.BooleanField(default=True)
     
-    # class Meta:
-    #     ordering = ["-date_created"]
+    class Meta:
+        ordering = ["-date_created"]
     
     def __str__(self) -> str:
         return self.assigned_case.responder.agency.acronym
