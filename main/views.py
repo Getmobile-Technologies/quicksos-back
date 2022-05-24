@@ -273,3 +273,4 @@ def mark_as_emergency(request, message_id):
                     "errors": f'Message not found'
                     }
             return Response(errors, status=status.HTTP_404_NOT_FOUND)
+        
