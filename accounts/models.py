@@ -13,6 +13,8 @@ AUTH_PROVIDERS = {'facebook': 'facebook',
                   'google': 'google',  
                   'email': 'email'}
 
+phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+2341234567890'. Up to 15 digits allowed.")
+ 
 class User(AbstractBaseUser, PermissionsMixin):
     
     ROLE_CHOICES = (
@@ -22,7 +24,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('admin', "Admin")
     )
        
-    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+2341234567890'. Up to 15 digits allowed.")
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     first_name    = models.CharField(_('first name'),max_length = 250)

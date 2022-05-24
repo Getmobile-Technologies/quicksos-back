@@ -251,3 +251,25 @@ def message_report(request, message_id):
                     "errors": f'Message not found'
                     }
             return Response(errors, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAgent])
+def mark_as_emergency(request, message_id):        
+    if request.method == "GET":
+        try:
+            message = Message.objects.get(is_active=True, id=message_id)
+            message.is_emergency=True
+            message.save()
+            
+            data = {"message":"success"
+                    }
+            
+            return Response(data,status=status.HTTP_200_OK)
+        except Message.DoesNotExist:
+            errors = {
+                    "message":"failed",
+                    "errors": f'Message not found'
+                    }
+            return Response(errors, status=status.HTTP_404_NOT_FOUND)
