@@ -196,11 +196,11 @@ def escalate(request, message_id):
         
         if serializer.is_valid():
             obj.agencies.set(serializer.validated_data['agencies'])
-            obj.agent = request.user
-            obj.status="escalated"
+            # obj.agent = request.user
+            obj.status= "escalated"
             obj.save()
         
-            return Response({"message":"successful"}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"message":"successful"}, status=status.HTTP_201_CREATED)
         else:
             errors = {
                 "message":"failed",
