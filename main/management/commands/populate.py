@@ -6,9 +6,9 @@ class Command(BaseCommand):
     help = 'Populates the DB with agencies, issues and questions'
 
     def handle(self, *args, **options):
-        Agency.objects.delete()
-        Issue.objects.delete()
-        Question.objects.delete()
+        Agency.objects.all().delete()
+        Issue.objects.all().delete()
+        Question.objects.all().delete()
         agencies = [("Nigeria Police Force", "NPF"), ("Lagos State Emergency Management Agency", "LASEMA")]
         agency = [Agency(name=agent[0], acronym=agent[1]) for agent in agencies]
         Agency.objects.bulk_create(agency)
@@ -25,12 +25,12 @@ class Command(BaseCommand):
                          'What is the victim\'s gender?', 
                          'Have the victim (he/she) had a bath?', 
                          'Have the victim reported to any police station?' ],
-            issues[3] : ["Describe the details of the incident", "Please send us a picture."],
+            issues[2] : ["Describe the details of the incident", "Please send us a picture."],
         }
         
         
         for issue in issues:
             ish = Issue.objects.get(name = issue)
-            Question.objects.bulk_create([Question.objects.create(issue=ish,question = question) for question in questions[issue]])
+            Question.objects.bulk_create([Question(issue=ish,question = question) for question in questions[issue]])
             
         self.stdout.write(self.style.SUCCESS('Successfully added data'))
