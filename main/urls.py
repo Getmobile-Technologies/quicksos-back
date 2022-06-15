@@ -5,7 +5,7 @@ from django.urls import path
 urlpatterns = [
     path("message/", views.add_message),
     path("messages/all", views.get_message),
-    path("messages/pending", views.peding_message),
+    path("messages/pending", views.pending_message),
     path("messages/<uuid:message_id>/escalate/", views.escalate),
     path("messages/<uuid:message_id>/report/", views.message_report),
     path("messages/escalated/", views.escalated_message),

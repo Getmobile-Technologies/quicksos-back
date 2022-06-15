@@ -55,6 +55,7 @@ class Common(Configuration):
         'coreapi',
         'corsheaders',
         'django_rest_passwordreset',
+        'rest_framework.authtoken'
     ]
 
     MIDDLEWARE = [

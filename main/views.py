@@ -9,10 +9,13 @@ from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from accounts.permissions import IsAdmin, IsAdminOrReadOnly, IsAgent, IsAgentOrAdmin, IsEscalator
-
+from django.utils import timezone
+from rest_framework.authentication import TokenAuthentication
 
 @swagger_auto_schema("post", request_body=MessageSerializer())
 @api_view(["POST"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAgent])
 def add_message(request):
     
     if request.method == "POST":
@@ -26,8 +29,8 @@ def add_message(request):
     
 
 @api_view(["GET"])
-# @authentication_classes([JWTAuthentication])
-# @permission_classes([IsAgentOrAdmin])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAgentOrAdmin])
 def get_message(request):        
     if request.method == "GET":
         messages = Message.objects.filter(is_active=True)
@@ -40,7 +43,7 @@ def get_message(request):
 @api_view(["GET"])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAgent])
-def peding_message(request):        
+def pending_message(request):        
     if request.method == "GET":
         messages = Message.objects.filter(is_active=True, status = "pending")
         serializer = MessageSerializer(messages, many=True)
@@ -49,7 +52,7 @@ def peding_message(request):
         
         return Response(data,status=status.HTTP_200_OK)
     
-@api_view(["GET"])
+@api_view(["GET", "PUT", "DELETE"])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAgent])
 def message_detail(request, message_id):
@@ -196,8 +199,10 @@ def escalate(request, message_id):
         
         if serializer.is_valid():
             obj.agencies.set(serializer.validated_data['agencies'])
-            # obj.agent = request.user
+            obj.agent = request.user
             obj.status= "escalated"
+            obj.date_escalated = timezone.now()
+            
             obj.save()
         
             return Response({"message":"successful"}, status=status.HTTP_201_CREATED)
@@ -238,7 +243,9 @@ def message_report(request, message_id):
                     "agency":model_to_dict(case.responder.agency),
                     "escalator_note": case.escalator_note, 
                     "status":case.status, 
-                    'reports':case.report_detail 
+                    'reports':case.report_detail,
+                    "assigned_date" : case.date_created,
+                    "escalated_date" : message.date_escalated
                     } for case in message.assigned.all()]
             
             data = {"message":"success",
