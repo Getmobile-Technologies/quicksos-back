@@ -287,7 +287,7 @@ def mark_as_emergency(request, message_id):
 # =========== CRUD QUESTIONS, ISSUES AND RESPONSES ================
 @swagger_auto_schema("post", request_body=IssueSerializer())
 @api_view(["GET", "POST"])
-@authentication_classes([JWTAuthentication])
+@authentication_classes([JWTAuthentication, TokenAuthentication])
 @permission_classes([IsAdminOrReadOnly])
 def issues(request):
     
