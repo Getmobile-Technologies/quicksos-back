@@ -37,31 +37,19 @@ class Message(models.Model):
     PROVIDERS = (("whatsapp", "Whatsapp"), 
                  ("call", "Call"))
     
-    CATEGORY_CHOICES = (('rape', 'Rape'), ('child_abuse', 'Child Abuse'), ('domestic_violence', 'Domestic Violence'), ('missing_person', 'Missing Person'), ('dead_body', 'Dead Body'), ('collapsed_building', 'Collapsed Building'), ('accident', 'Accident'), ('fight', 'Fight'), ('fire_outbreak', 'Fire Outbreak'))
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-    name_of_reporter = models.CharField(max_length=300)
+    name = models.CharField(max_length=300)
     phone = models.CharField(max_length=15,  validators=[phone_regex])
-    victim_name = models.CharField(max_length=300, null=True,blank=True)
-    victim_gender = models.CharField(max_length=300, null=True,blank=True)
-    victim_age = models.CharField(max_length=300, null=True,blank=True)
     status = models.CharField(max_length=300, default="pending", choices=STATUS)
-    category = models.CharField(max_length=300, choices=CATEGORY_CHOICES)
-    description = models.TextField()
     address = models.TextField(null=True,blank=True)
-    incident_address = models.TextField(null=True,blank=True)
-    image_url1 = models.URLField(null=True, blank=True)
-    image_url2 = models.URLField(null=True, blank=True)
-    additional_info = models.TextField(null=True,blank=True)
-    last_seen_detail = models.TextField(null=True,blank=True)
     is_emergency = models.BooleanField(default=False)
-    
     agent = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     agencies =  models.ManyToManyField(Agency, related_name="messages", blank=True)
     agent_note = models.TextField(blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
+    date_escalated = models.DateTimeField(null=True)
     provider = models.CharField(max_length=255, default="whatsapp", choices=PROVIDERS)
-    
     is_active=models.BooleanField(default=True)
     
     
@@ -69,8 +57,15 @@ class Message(models.Model):
         ordering = ["-date_created"]
 
     def __str__(self) -> str:
-        return self.issue
+        return self.name
     
+    @property
+    def response_data(self):
+        return self.answers.filter(is_active=True).values("answer",'question__question')
+    
+    @property
+    def issue(self):
+        return self.answers.first().question.issue.name
     
     def delete(self):
         self.is_active=False
@@ -79,10 +74,60 @@ class Message(models.Model):
 
 
     
-# a = ["RAPE", "CHILD ABUSE", "DOMESTIC VIOLENCE", "ENQUIRY", "MISSING PERSON", "DEAD BODY", "COLLAPSED BUILDING", "ACCIDENT","FIGHT",  "FIRE OUTBREAK"]
-
-# b = []
-# for i in a:
-#     b.append((i.lower(), i.title()))
-# print(b)
+class Issue(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    name = models.CharField(max_length=250, unique=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    is_active=models.BooleanField(default=True)
+    
+    
+    def __str__(self) -> str:
+        return self.name
+    
+    @property
+    def question_list(self):
+        return self.questions.filter(is_active=True).values("id", "question")
+    
+    
+    def delete(self):
+        self.is_active=False
+        self.questions.update(is_active=False)
+        self.save()
         
+        
+class Question(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    question = models.CharField(max_length=250)
+    issue = models.ForeignKey("main.Issue", on_delete=models.CASCADE, related_name="questions", null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    is_active=models.BooleanField(default=True)
+    
+    
+    def __str__(self) -> str:
+        return f"{self.question} ---> {self.issue.name}"
+    
+    
+    def delete(self):
+        self.is_active=False
+        self.answers.update(is_active=False)
+        self.save()
+        
+        
+class Answer(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    question = models.ForeignKey("main.Question", on_delete=models.CASCADE, related_name="answers")
+    message = models.ForeignKey("main.Message", on_delete=models.CASCADE, related_name="answers")
+    answer = models.TextField()
+    date_created = models.DateTimeField(auto_now_add=True)
+    is_active=models.BooleanField(default=True)
+    
+    
+    def __str__(self) -> str:
+        return f"{self.answer} ---> {self.message.name}"
+    
+    
+    def delete(self):
+        self.is_active=False
+        self.save()
+    
+    

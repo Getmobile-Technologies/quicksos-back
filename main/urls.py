@@ -13,4 +13,7 @@ urlpatterns = [
     path("messages/<uuid:message_id>/mark_as_emergency/", views.mark_as_emergency),
     path("agencies/", views.agencies),
     path("agencies/<uuid:agency_id>/", views.agency_detail),   
+    path("issues/", views.issues),
+    path("issues/<uuid:issue_id>/", views.issue_detail),
+    path("questions/<uuid:question_id>/", views.question_detail),  
 ]
