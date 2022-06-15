@@ -6,13 +6,16 @@ class Command(BaseCommand):
     help = 'Populates the DB with agencies, issues and questions'
 
     def handle(self, *args, **options):
+        Agency.objects.delete()
+        Issue.objects.delete()
+        Question.objects.delete()
         agencies = [("Nigeria Police Force", "NPF"), ("Lagos State Emergency Management Agency", "LASEMA")]
         agency = [Agency(name=agent[0], acronym=agent[1]) for agent in agencies]
         Agency.objects.bulk_create(agency)
         
         issues = ["Fight", "Rape", "Dead Body"]
         
-        Issue.objects.create([Issue(name=issue) for issue in issues])
+        Issue.objects.bulk_create([Issue(name=issue) for issue in issues])
         
         questions = {
             issues[0] : ["Describe the details of the incident", "Please send us a picture."],
