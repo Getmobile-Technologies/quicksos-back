@@ -52,13 +52,14 @@ QuickSOS Team.
         #                 'first_name': str(instance.first_name).title(),
         #                 'code':code,
         #                 'url':url})
+        instance.set_password(instance.password)
+        instance.save()
         
         email_from = settings.Common.DEFAULT_FROM_EMAIL
         recipient_list = [instance.email]
         send_mail(subject, message, email_from, recipient_list)
         
-        instance.set_password(instance.password)
-        instance.save()
+        
         # print(instance.password)
         return
     
