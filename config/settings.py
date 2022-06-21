@@ -27,7 +27,7 @@ class Common(Configuration):
     SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
     # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = values.BooleanValue(False)
+    DEBUG = values.BooleanValue(True)
 
     ALLOWED_HOSTS = []
 
@@ -209,7 +209,7 @@ class Staging(Common):
     """
     The in-staging settings.
     """
-    DEBUG = False
+    DEBUG = True
     
     ALLOWED_HOSTS = ['quicksos-api.herokuapp.com']
     # Security
