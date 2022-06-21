@@ -14,7 +14,7 @@ from rest_framework.authentication import TokenAuthentication
 
 @swagger_auto_schema("post", request_body=MessageSerializer())
 @api_view(["POST"])
-@authentication_classes([JWTAuthentication])
+@authentication_classes([JWTAuthentication, TokenAuthentication])
 @permission_classes([IsAgent])
 def add_message(request):
     
