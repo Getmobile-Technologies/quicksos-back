@@ -139,8 +139,11 @@ class Common(Configuration):
 
     AUTH_USER_MODEL = 'accounts.User'
     
+    # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = "Desmond from QUICKSOS <hello@getmobile.tech>"
+    
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    DEFAULT_FROM_EMAIL = "Ade from QUICKSOS <hello@getmobile.tech>"
+    
 
     SIMPLE_JWT = {
         'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
@@ -209,7 +212,7 @@ class Staging(Common):
     """
     The in-staging settings.
     """
-    DEBUG = True
+    DEBUG = False
     
     ALLOWED_HOSTS = ['quicksos-api.herokuapp.com']
     # Security
@@ -229,9 +232,8 @@ class Staging(Common):
     EMAIL_HOST = 'smtp.gmass.co'
     EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-    EMAIL_PORT = 25 
-    EMAIL_USE_TLS = True    # use port 587
-
+    EMAIL_PORT = 465
+    EMAIL_USE_TLS = True 
 
 class Production(Staging):
     """
