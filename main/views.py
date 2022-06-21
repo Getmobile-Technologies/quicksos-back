@@ -20,7 +20,9 @@ def add_message(request):
     
     if request.method == "POST":
         serializer = MessageSerializer(data=request.data)
+        print(request.data)
         if serializer.is_valid():
+            print(serializer.validated_data)
             serializer.save()
             
             return Response({"message":"success"}, status=status.HTTP_201_CREATED)
