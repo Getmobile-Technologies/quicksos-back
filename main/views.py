@@ -201,6 +201,7 @@ def escalate(request, message_id):
         
         if serializer.is_valid():
             obj.agencies.set(serializer.validated_data['agencies'])
+            print(request.user)
             obj.agent = request.user
             obj.status= "escalated"
             obj.date_escalated = timezone.now()
