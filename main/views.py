@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from accounts.permissions import IsAdmin, IsAdminOrReadOnly, IsAgent, IsAgentOrAdmin, IsEscalator
 from django.utils import timezone
 from rest_framework.authentication import TokenAuthentication
-from restframework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 @swagger_auto_schema("post", request_body=MessageSerializer())
 @api_view(["POST"])
 @authentication_classes([JWTAuthentication, TokenAuthentication])
