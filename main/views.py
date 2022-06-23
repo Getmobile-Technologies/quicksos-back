@@ -4,14 +4,14 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from .serializers import EscalateSerializer, AgencySerializer, IssueSerializer, MessageSerializer
 from drf_yasg.utils import swagger_auto_schema
-from .models import Agency, Issue, Message, Question
+from .models import Agency, Issue, Message, Question, User
 from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from accounts.permissions import IsAdmin, IsAdminOrReadOnly, IsAgent, IsAgentOrAdmin, IsEscalator
 from django.utils import timezone
 from rest_framework.authentication import TokenAuthentication
-
+from restframework.exceptions import ValidationError
 @swagger_auto_schema("post", request_body=MessageSerializer())
 @api_view(["POST"])
 @authentication_classes([JWTAuthentication, TokenAuthentication])
@@ -200,9 +200,20 @@ def escalate(request, message_id):
         serializer = EscalateSerializer(data=request.data)
         
         if serializer.is_valid():
-            obj.agencies.set(serializer.validated_data['agencies'])
-            print(request.user)
-            obj.agent = request.user
+            agencies_ = serializer.validated_data.get('agencies')
+            
+            #check all the agencies to be escalated to, if any does not have an escalator, raise an error.
+            for agency in agencies_:
+                if agency.members.all().filter(role="escalator").exists():
+                    continue
+                else:
+                    raise ValidationError(detail={
+                        "error": f"Cannot escalate because {agency.acronym} does not have an escalator account."
+                    })
+                    
+            obj.agencies.set(agencies_)
+            # print(request.user)
+            # obj.agent = request.user
             obj.status= "escalated"
             obj.date_escalated = timezone.now()
             
