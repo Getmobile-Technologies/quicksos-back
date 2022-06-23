@@ -248,7 +248,9 @@ def message_report(request, message_id):
     if request.method == "GET":
         try:
             message = Message.objects.get(is_active=True, id=message_id)
-            data_ = {"responder_reports":[{
+            msg_serializer = MessageSerializer(message)
+            data_ = {"message_data":msg_serializer.data,
+                "responder_reports":[{
                     "first_responder": model_to_dict(case.responder,exclude=
                                                  ['password',
                                                   'groups',
@@ -260,9 +262,8 @@ def message_report(request, message_id):
                     "responder_status":case.status, 
                     'reports':case.report_detail,
                     "assigned_date" : case.date_created,
-                    "escalated_date" : message.date_escalated
                     } for case in message.assigned.all()],
-                     "message_status":message.status}
+                     }
             
             data = {"message":"success",
                     "data":data_}
