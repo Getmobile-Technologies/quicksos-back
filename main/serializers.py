@@ -20,7 +20,7 @@ class MessageSerializer(serializers.ModelSerializer):
     responses = PostAnswerSerializer(many=True, write_only=True)
     response_data = serializers.ReadOnlyField()
     issue = serializers.ReadOnlyField()
-    
+    agency_detail = serializers.ReadOnlyField()    
     class Meta:
         model = Message
         fields = '__all__'

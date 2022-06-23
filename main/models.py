@@ -67,6 +67,10 @@ class Message(models.Model):
     def issue(self):
         return self.answers.first().question.issue.name
     
+    @property
+    def agency_detail(self):
+        return self.agencies.values("acronym")
+    
     def delete(self):
         self.is_active=False
         self.save()
