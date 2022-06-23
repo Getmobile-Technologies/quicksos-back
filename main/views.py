@@ -248,19 +248,21 @@ def message_report(request, message_id):
     if request.method == "GET":
         try:
             message = Message.objects.get(is_active=True, id=message_id)
-            data_ = [{"first_responder": model_to_dict(case.responder,
-                                                    exclude=['password',
-                                                            'groups',
-                                                            'user_permissions',
-                                                            'agency',
-                                                            'last_login']),
+            data_ = {"responder_reports":[{
+                    "first_responder": model_to_dict(case.responder,exclude=
+                                                 ['password',
+                                                  'groups',
+                                                  'user_permissions',
+                                                  'agency',
+                                                  'last_login']),
                     "agency":model_to_dict(case.responder.agency),
                     "escalator_note": case.escalator_note, 
-                    "status":case.status, 
+                    "responder_status":case.status, 
                     'reports':case.report_detail,
                     "assigned_date" : case.date_created,
                     "escalated_date" : message.date_escalated
-                    } for case in message.assigned.all()]
+                    } for case in message.assigned.all()],
+                     "message_status":message.status}
             
             data = {"message":"success",
                     "data":data_}
