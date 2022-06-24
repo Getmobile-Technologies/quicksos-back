@@ -90,7 +90,7 @@ class Issue(models.Model):
     
     @property
     def question_list(self):
-        return self.questions.filter(is_active=True).values("id", "question")
+        return self.questions.filter(is_active=True).values("id", "question", "is_image")
     
     
     def delete(self):
@@ -103,6 +103,7 @@ class Question(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     question = models.CharField(max_length=250)
     issue = models.ForeignKey("main.Issue", on_delete=models.CASCADE, related_name="questions", null=True)
+    is_image = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     is_active=models.BooleanField(default=True)
     

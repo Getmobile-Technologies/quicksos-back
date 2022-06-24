@@ -29,7 +29,7 @@ class AssignedCase(models.Model):
     
     @property
     def case_detail(self):
-        return model_to_dict(self.case)
+        return model_to_dict(self.case, exclude="agencies")
     
     def delete(self):
         self.is_active=False

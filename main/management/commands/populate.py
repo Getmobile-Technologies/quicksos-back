@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
-from ...models import Agency, Issue, Question
-
+from ...models import Agency, Issue, Message, Question
+import json
 
 class Command(BaseCommand):
     help = 'Populates the DB with agencies, issues and questions'
@@ -9,28 +9,23 @@ class Command(BaseCommand):
         # Agency.objects.all().delete()
         Issue.objects.all().delete()
         Question.objects.all().delete()
-        agencies = [("Nigeria Police Force", "NPF"), ("Lagos State Emergency Management Agency", "LASEMA")]
-        agency = [Agency(name=agent[0], acronym=agent[1]) for agent in agencies]
-        Agency.objects.bulk_create(agency)
-        
-        issues = ["Fight", "Rape", "Dead Body"]
-        
-        Issue.objects.bulk_create([Issue(name=issue) for issue in issues])
-        
-        questions = {
-            issues[0] : ["Describe the details of the incident", "Please send us a picture."],
-            issues[1] : ['Describe details of the incident', 
-                         'What is the victim name?', 
-                         'How old is he/she?', 
-                         'What is the victim\'s gender?', 
-                         'Have the victim (he/she) had a bath?', 
-                         'Have the victim reported to any police station?' ],
-            issues[2] : ["Describe the details of the incident", "Please send us a picture."],
-        }
-        
-        
-        for issue in issues:
-            ish = Issue.objects.get(name = issue)
-            Question.objects.bulk_create([Question(issue=ish,question = question) for question in questions[issue]])
+        Message.objects.all().delete()
+        # agencies = [("Nigeria Police Force", "NPF"), ("Lagos State Emergency Management Agency", "LASEMA")]
+        # agency = [Agency(name=agent[0], acronym=agent[1]) for agent in agencies]
+        # Agency.objects.bulk_create(agency)
+        with open("main\management\commands\output.json") as file:
+            data = json.load(file)
+        print(data.keys())
+        for i in data.keys():
+            print(i)
+            data_ = data.get(i)
+            # if data_ is None:
+            #     continue
+            # print(data_['description'])
+            issue  =Issue.objects.create(name=data_["description"])
+            questions = [Question(**i, issue=issue) for i in data_["flow"]]
+            Question.objects.bulk_create(questions) 
             
+        
+           
         self.stdout.write(self.style.SUCCESS('Successfully added data'))
