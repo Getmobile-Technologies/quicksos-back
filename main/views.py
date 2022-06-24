@@ -180,9 +180,9 @@ def agency_detail(request, agency_id):
 
 
 @swagger_auto_schema("post", request_body=EscalateSerializer())
+@api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAgent])
-@api_view(['POST'])
 def escalate(request, message_id):
     try:
         obj = Message.objects.get(id=message_id, is_active=True, status="pending")
@@ -213,7 +213,7 @@ def escalate(request, message_id):
                     
             obj.agencies.set(agencies_)
             # print(request.user)
-            # obj.agent = request.user
+            obj.agent = request.user
             obj.status= "escalated"
             obj.date_escalated = timezone.now()
             

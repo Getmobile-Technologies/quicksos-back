@@ -12,9 +12,9 @@ from rest_framework.exceptions import PermissionDenied
 import cloudinary
 
 @swagger_auto_schema("post", request_body=AssignedCaseSerializer())
+@api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsEscalator])
-@api_view(['POST'])
 def assign(request):
     if request.method=="POST":
         serializer = AssignedCaseSerializer(data=request.data)
@@ -41,9 +41,9 @@ def assign(request):
 
 
 
+@api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-@api_view(['GET'])
 def assigned_cases(request):
     if request.method=="GET":
         
@@ -68,9 +68,9 @@ def assigned_cases(request):
 
 
 @swagger_auto_schema("post", request_body=ReportSerializer())
+@api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsResponder])
-@api_view(['POST'])
 def add_report(request, assigned_case_id):
     try:
         obj = AssignedCase.objects.get(id=assigned_case_id, is_active=True, status='pending')
