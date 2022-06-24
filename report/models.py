@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.forms import model_to_dict
 from main.models import Message
 
 User=get_user_model()
@@ -25,6 +26,10 @@ class AssignedCase(models.Model):
     @property
     def report_detail(self):
         return self.reports.all().values("situation_report", "image_url1", "image_url2")
+    
+    @property
+    def case_detail(self):
+        return model_to_dict(self.case)
     
     def delete(self):
         self.is_active=False
