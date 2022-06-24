@@ -56,7 +56,6 @@ def assigned_cases(request):
         
         serializer = AssignedCaseSerializer(obj, many=True)
         
-        serializer.save()
         
         data = {
             "message":"success",
