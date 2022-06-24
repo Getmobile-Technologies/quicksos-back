@@ -13,7 +13,7 @@ class Command(BaseCommand):
         # agencies = [("Nigeria Police Force", "NPF"), ("Lagos State Emergency Management Agency", "LASEMA")]
         # agency = [Agency(name=agent[0], acronym=agent[1]) for agent in agencies]
         # Agency.objects.bulk_create(agency)
-        with open("main\management\commands\output.json") as file:
+        with open("/main/management/commands/output.json") as file:
             data = json.load(file)
         print(data.keys())
         for i in data.keys():
