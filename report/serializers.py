@@ -4,6 +4,7 @@ from .models import AssignedCase, Report
 
 class AssignedCaseSerializer(serializers.ModelSerializer):
     case_detail = serializers.ReadOnlyField()
+    issue = serializers.ReadOnlyField()
     
     class Meta:
         model = AssignedCase

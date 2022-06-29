@@ -31,6 +31,10 @@ class AssignedCase(models.Model):
     def case_detail(self):
         return model_to_dict(self.case, exclude="agencies")
     
+    @property()
+    def issue(self):
+        return self.case.answers().first().question.issue.name
+    
     def delete(self):
         self.is_active=False
         self.save()
