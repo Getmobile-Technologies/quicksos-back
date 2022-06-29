@@ -35,6 +35,13 @@ class AssignedCase(models.Model):
     def issue(self):
         return self.case.answers.all().first().question.issue.name
     
+    @property
+    def img_url(self):
+        for response in self.case.answers():
+            if response.question.is_image ==True:
+                return response.answer
+        return ""
+    
     def delete(self):
         self.is_active=False
         self.save()
