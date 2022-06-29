@@ -37,7 +37,7 @@ class AssignedCase(models.Model):
     
     @property
     def img_url(self):
-        for response in self.case.answers():
+        for response in self.case.answers.all():
             if response.question.is_image ==True:
                 return response.answer
         return ""
