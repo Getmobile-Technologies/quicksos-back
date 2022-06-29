@@ -33,7 +33,7 @@ class AssignedCase(models.Model):
     
     @property
     def issue(self):
-        return self.case.answers().first().question.issue.name
+        return self.case.answers.all().first().question.issue.name
     
     def delete(self):
         self.is_active=False
