@@ -65,8 +65,8 @@ def assigned_cases(request):
         return Response(data, status=status.HTTP_200_OK)
 
 
-@swagger_auto_schema("post", request_body=ReportSerializer())
-@api_view(['POST'])
+
+@api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsResponder])
 def respond(request, assigned_case_id):
@@ -83,8 +83,8 @@ def respond(request, assigned_case_id):
                 }
         return Response(errors, status=status.HTTP_404_NOT_FOUND)
     
-@swagger_auto_schema("post", request_body=ReportSerializer())
-@api_view(['POST'])
+
+@api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsResponder])
 def has_arrived(request, assigned_case_id):
