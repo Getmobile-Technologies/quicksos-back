@@ -71,15 +71,20 @@ def assigned_cases(request):
 @permission_classes([IsResponder])
 def respond(request, assigned_case_id):
     try:
-        obj = AssignedCase.objects.get(id=assigned_case_id, is_active=True, responded=False)
-        obj.responded=True
-        obj.save()
-        return Response({"message":"successful"}, status=status.HTTP_202_ACCEPTED)
+        obj = AssignedCase.objects.get(id=assigned_case_id, is_active=True)
+        
+        if obj.responded==False:
+            obj.responded=True
+            obj.save()
+            return Response({"message":"successful"}, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response({"errors":"You have already responded to this case"}, status=status.HTTP_400_BAD_REQUEST)
+        
         
     except AssignedCase.DoesNotExist:
         errors = {
                 "message":"failed",
-                "errors": f'Case not found or has been responded to.'
+                "errors": f'Case not found'
                 }
         return Response(errors, status=status.HTTP_404_NOT_FOUND)
     
@@ -89,10 +94,14 @@ def respond(request, assigned_case_id):
 @permission_classes([IsResponder])
 def has_arrived(request, assigned_case_id):
     try:
-        obj = AssignedCase.objects.get(id=assigned_case_id, is_active=True, arrived=False, responded=True)
-        obj.arrived=True
-        obj.save()
-        return Response({"message":"successful"}, status=status.HTTP_202_ACCEPTED)
+        obj = AssignedCase.objects.get(id=assigned_case_id, is_active=True, responded=True)
+        
+        if obj.arrived==False:
+            obj.arrived=True
+            obj.save()
+            return Response({"message":"successful"}, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response({"errors":"You have arrived at this case before."}, status=status.HTTP_400_BAD_REQUEST)
         
     except AssignedCase.DoesNotExist:
         errors = {
