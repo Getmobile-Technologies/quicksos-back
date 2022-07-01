@@ -11,8 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from accounts.permissions import IsAdmin, IsAdminOrReadOnly, IsAgent, IsAgentOrAdmin, IsEscalator
 from django.utils import timezone
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.exceptions import ValidationError
-
+from .helpers.check_agency import validate_responders
 
 
 
@@ -25,16 +24,20 @@ def add_message(request):
     
     if request.method == "POST":
         serializer = MessageSerializer(data=request.data)
-        # print(request.data)
+
         if serializer.is_valid():
-            # print(serializer.validated_data)
-            
-                
-            message_ = Message.objects.create(**serializer.validated_data)
-           
+    
             if serializer.validated_data.get("provider") == "call":
-               message_.status = "escalated"
-               message_.save()
+                agencies_ = serializer.validated_data.get("agencies")
+                if validate_responders(agencies_):
+                    message_ = Message.objects.create(**serializer.validated_data)
+                    
+                    message_.status = "escalated"
+                    message_.date_escalated = timezone.now()
+                    message_.save()
+            else:
+    
+                serializer.save()
             
             
             
@@ -216,23 +219,17 @@ def escalate(request, message_id):
             agencies_ = serializer.validated_data.get('agencies')
             
             #check all the agencies to be escalated to, if any does not have an escalator, raise an error.
-            for agency in agencies_:
-                if agency.members.all().filter(role="escalator").exists():
-                    continue
-                else:
-                    raise ValidationError(detail={
-                        "error": f"Cannot escalate because {agency.acronym} does not have an escalator account."
-                    })
+            if validate_responders(agencies_):
                     
-            obj.agencies.set(agencies_)
-            # print(request.user)
-            obj.agent = request.user
-            obj.status= "escalated"
-            obj.date_escalated = timezone.now()
+                obj.agencies.set(agencies_)
+                # print(request.user)
+                obj.agent = request.user
+                obj.status= "escalated"
+                obj.date_escalated = timezone.now()
+                
+                obj.save()
             
-            obj.save()
-        
-            return Response({"message":"successful"}, status=status.HTTP_201_CREATED)
+                return Response({"message":"successful"}, status=status.HTTP_201_CREATED)
         else:
             errors = {
                 "message":"failed",
