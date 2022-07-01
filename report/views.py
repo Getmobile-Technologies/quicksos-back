@@ -108,11 +108,11 @@ def has_arrived(request, assigned_case_id):
 @permission_classes([IsResponder])
 def add_report(request, assigned_case_id):
     try:
-        obj = AssignedCase.objects.get(id=assigned_case_id, is_active=True, status='pending')
+        obj = AssignedCase.objects.get(id=assigned_case_id, is_active=True, status='pending', responded=True, arrived=True)
     except AssignedCase.DoesNotExist:
         errors = {
                 "message":"failed",
-                "errors": f'Case not found or has been completed.'
+                "errors": f'Case not found or has not been responded to.'
                 }
         return Response(errors, status=status.HTTP_404_NOT_FOUND)
     
@@ -151,9 +151,9 @@ def add_report(request, assigned_case_id):
                     return Response(data, status = status.HTTP_400_BAD_REQUEST)
             serializer.save()
             
-            if serializer.validated_data.get('mark_complete') == True:
-                obj.status = "complete"
-                obj.save()
+           
+            obj.status = "complete"
+            obj.save()
                 
             return Response({"message":"successful"}, status=status.HTTP_202_ACCEPTED)
         else:

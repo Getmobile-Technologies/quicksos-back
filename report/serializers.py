@@ -15,7 +15,7 @@ class AssignedCaseSerializer(serializers.ModelSerializer):
 class ReportSerializer(serializers.ModelSerializer):
     img1 = serializers.ImageField()
     img2 = serializers.ImageField(required=False)
-    mark_complete = serializers.BooleanField()
+    # mark_complete = serializers.BooleanField()
     
     class Meta:
         model=Report
