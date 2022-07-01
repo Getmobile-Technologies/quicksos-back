@@ -13,6 +13,8 @@ class AssignedCase(models.Model):
     case = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="assigned")
     escalator_note = models.TextField(null=True, blank=True)
     status = models.CharField(default="pending", max_length=200)
+    responded = models.BooleanField(default=False)
+    arrived = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     is_active=models.BooleanField(default=True)
     

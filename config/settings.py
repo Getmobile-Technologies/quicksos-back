@@ -16,10 +16,17 @@ from django.utils.timezone import timedelta
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 import cloudinary
+import firebase_admin
+from firebase_admin import credentials
+import json
  
 load_dotenv(find_dotenv())
 
 class Common(Configuration):
+    FIREBASE_CREDENTIALS = json.loads(os.getenv('FIREBASE_CREDENTIALS'))
+    cred = credentials.Certificate(FIREBASE_CREDENTIALS)
+    firebase_admin.initialize_app(cred)
+    
     # Build paths inside the project like this: BASE_DIR / 'subdir'.
     BASE_DIR = Path(__file__).resolve().parent.parent
 

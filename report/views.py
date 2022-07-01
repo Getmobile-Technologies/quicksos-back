@@ -65,7 +65,43 @@ def assigned_cases(request):
         return Response(data, status=status.HTTP_200_OK)
 
 
-
+@swagger_auto_schema("post", request_body=ReportSerializer())
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsResponder])
+def respond(request, assigned_case_id):
+    try:
+        obj = AssignedCase.objects.get(id=assigned_case_id, is_active=True, responded=False)
+        obj.responded=True
+        obj.save()
+        return Response({"message":"successful"}, status=status.HTTP_202_ACCEPTED)
+        
+    except AssignedCase.DoesNotExist:
+        errors = {
+                "message":"failed",
+                "errors": f'Case not found or has been responded to.'
+                }
+        return Response(errors, status=status.HTTP_404_NOT_FOUND)
+    
+@swagger_auto_schema("post", request_body=ReportSerializer())
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsResponder])
+def has_arrived(request, assigned_case_id):
+    try:
+        obj = AssignedCase.objects.get(id=assigned_case_id, is_active=True, arrived=False, responded=True)
+        obj.arrived=True
+        obj.save()
+        return Response({"message":"successful"}, status=status.HTTP_202_ACCEPTED)
+        
+    except AssignedCase.DoesNotExist:
+        errors = {
+                "message":"failed",
+                "errors": f'Case not found or has not been responded to.'
+                }
+        return Response(errors, status=status.HTTP_404_NOT_FOUND)
+    
+    
 @swagger_auto_schema("post", request_body=ReportSerializer())
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
