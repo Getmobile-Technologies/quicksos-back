@@ -69,3 +69,11 @@ class Report(models.Model):
     def delete(self):
         self.is_active=False
         self.save()
+        
+        
+        
+# class RequestMessage(models.Model):
+#     case = models.ForeignKey("main.Message", on_delete=models.CASCADE, related_name="requests")
+#     sender = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="requests")
+#     admin = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related="requests")
+#     request_body = models.TextField()

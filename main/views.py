@@ -25,10 +25,18 @@ def add_message(request):
     
     if request.method == "POST":
         serializer = MessageSerializer(data=request.data)
-        print(request.data)
+        # print(request.data)
         if serializer.is_valid():
-            print(serializer.validated_data)
-            serializer.save()
+            # print(serializer.validated_data)
+            
+                
+            message_ = Message.objects.create(**serializer.validated_data)
+           
+            if serializer.validated_data.get("provider") == "call":
+               message_.status = "escalated"
+               message_.save()
+            
+            
             
             return Response({"message":"success"}, status=status.HTTP_201_CREATED)
         else:

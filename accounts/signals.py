@@ -40,8 +40,13 @@ def send_details(sender, instance, created, **kwargs):
         role = " ".join(str(instance.role).split('_'))
         subject = f"YOUR {role} ACCOUNT FOR QUICKSOS".upper()
         
+        if role.startswith(("a", "e", "i", "o", "u")):
+            article = "an"
+        else:
+            article = "a"
+        
         message = f"""Hi, {str(instance.first_name).title()}.
-You have just been onboarded on the quicksos platform. Your login details are below:
+You have just been on boarded on the quicksos platform as {article} {role.lower()}. Your login details are below:
 E-mail: {instance.email} 
 password: {instance.password}    
 
