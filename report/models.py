@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.forms import model_to_dict
 from main.models import Message
 
+
 User=get_user_model()
 # Create your models here.
 
@@ -74,8 +75,26 @@ class Report(models.Model):
         
         
         
-# class RequestMessage(models.Model):
-#     case = models.ForeignKey("main.Message", on_delete=models.CASCADE, related_name="requests")
-#     sender = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="requests")
-#     admin = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related="requests")
-#     request_body = models.TextField()
+# class RequestSupport(models.Model):
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+#     case = models.ForeignKey("main.Message", on_delete=models.CASCADE, related_name="requested_support")
+#     sender = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="requested_support")
+#     assignment = models.ForeignKey(AssignedCase, on_delete=models.CASCADE, related="requested_support")
+#     agencies = models.ManyToManyField('main.Agency',  on_delete=models.CASCADE, related="requested_support")
+#     date_created = models.DateTimeField(auto_now_add=True)
+#     is_active=models.BooleanField(default=True)
+    
+#     class Meta:
+#         ordering = ["-date_created"]
+    
+#     def __str__(self) -> str:
+#         return self.assigned_case.responder.agency.acronym
+    
+    
+#     def delete(self):
+#         self.is_active=False
+#         self.save()
+    
+    
+    
+    

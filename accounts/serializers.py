@@ -6,6 +6,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=300, required=False,allow_blank=True, write_only=True)
     image = serializers.ImageField( required=False)
+    agency_detail = serializers.ReadOnlyField()
     
     class Meta():
         model = User
