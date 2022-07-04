@@ -86,6 +86,7 @@ def respond(request, assigned_case_id):
         obj = AssignedCase.objects.get(id=assigned_case_id, is_active=True)
         
         if obj.responded==False:
+            obj.status="responded"
             obj.responded=True
             obj.save()
             return Response({"message":"successful"}, status=status.HTTP_202_ACCEPTED)
@@ -109,6 +110,7 @@ def has_arrived(request, assigned_case_id):
         obj = AssignedCase.objects.get(id=assigned_case_id, is_active=True, responded=True)
         
         if obj.arrived==False:
+            obj.status="arrived"
             obj.arrived=True
             obj.save()
             return Response({"message":"successful"}, status=status.HTTP_202_ACCEPTED)
