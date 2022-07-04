@@ -2,7 +2,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 
-from report.helpers.filters import filter_results
 from .serializers import AssignedCaseSerializer, ReportSerializer
 from drf_yasg.utils import swagger_auto_schema
 from .models import AssignedCase, Report
@@ -61,11 +60,11 @@ def assigned_cases(request):
         
         if query == "today":
             date = timezone.now()
-            obj = filter_results(obj, date)
+            obj = obj.filter(date_created__gte=date)
             
         if query == "recent":
             date = timezone.now() - timezone.timedelta(hours=6)
-            obj = filter_results(obj, date)
+            obj = obj.filter(date_created__gte=date)
             
         serializer = AssignedCaseSerializer(obj, many=True)
         
