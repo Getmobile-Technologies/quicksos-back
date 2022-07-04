@@ -1,6 +1,8 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
+
+from report.helpers.filters import filter_results
 from .serializers import AssignedCaseSerializer, ReportSerializer
 from drf_yasg.utils import swagger_auto_schema
 from .models import AssignedCase, Report
@@ -10,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from accounts.permissions import IsAdmin, IsAgent, IsEscalator, IsResponder
 from rest_framework.exceptions import PermissionDenied
 import cloudinary
+from django.utils import timezone
 
 @swagger_auto_schema("post", request_body=AssignedCaseSerializer())
 @api_view(['POST'])
@@ -46,6 +49,9 @@ def assign(request):
 @permission_classes([IsAuthenticated])
 def assigned_cases(request):
     if request.method=="GET":
+        recent = request.get("recent")
+        today = request.get("today")
+        
         
         if request.user.role == "escalator":
             obj = AssignedCase.objects.filter(responder__agency=request.user.agency, is_active=True)
@@ -54,6 +60,14 @@ def assigned_cases(request):
         else:
             raise PermissionDenied({"error":"You do not have the permission to view this"})
         
+        if today:
+            date = timezone.now()
+            obj = filter_results(obj, date)
+            
+        if recent:
+            date = timezone.now() - timezone.timedelta(hours=6)
+            obj = filter_results(obj, date)
+            
         serializer = AssignedCaseSerializer(obj, many=True)
         
         
