@@ -64,7 +64,7 @@ def assigned_cases(request):
             obj = filter_results(obj, date)
             
         if query == "recent":
-            date = timezone.now() - timezone.timedelta(hours=)
+            date = timezone.now() - timezone.timedelta(hours=6)
             obj = filter_results(obj, date)
             
         serializer = AssignedCaseSerializer(obj, many=True)
