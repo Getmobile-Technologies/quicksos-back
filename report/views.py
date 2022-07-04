@@ -49,7 +49,7 @@ def assign(request):
 @permission_classes([IsAuthenticated])
 def assigned_cases(request):
     if request.method=="GET":
-        query = request.query_params.get("filterBy")
+        query = request.GET.get("filterBy")
         
         
         if request.user.role == "escalator":
