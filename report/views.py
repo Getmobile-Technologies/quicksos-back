@@ -49,8 +49,7 @@ def assign(request):
 @permission_classes([IsAuthenticated])
 def assigned_cases(request):
     if request.method=="GET":
-        recent = request.get("recent")
-        today = request.get("today")
+        query = request.query_params.get("filterBy")
         
         
         if request.user.role == "escalator":
@@ -60,12 +59,12 @@ def assigned_cases(request):
         else:
             raise PermissionDenied({"error":"You do not have the permission to view this"})
         
-        if today:
+        if query == "today":
             date = timezone.now()
             obj = filter_results(obj, date)
             
-        if recent:
-            date = timezone.now() - timezone.timedelta(hours=6)
+        if query == "recent":
+            date = timezone.now() - timezone.timedelta(hours=)
             obj = filter_results(obj, date)
             
         serializer = AssignedCaseSerializer(obj, many=True)
