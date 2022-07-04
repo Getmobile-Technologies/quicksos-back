@@ -1,7 +1,4 @@
-import random
-import string
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied, ValidationError
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view, authentication_classes, permission_classes 
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -11,15 +8,10 @@ from accounts.permissions import IsAdmin
 from .serializers import ChangePasswordSerializer, LoginSerializer, UserSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenRefreshView
-from django.contrib.auth import authenticate
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.signals import user_logged_in
-from django.contrib.auth import get_user_model
 from .helpers.generators import generate_password
-
-
-
 import cloudinary
 import cloudinary.uploader
 
