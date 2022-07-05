@@ -75,25 +75,38 @@ class Report(models.Model):
         
         
         
-# class RequestSupport(models.Model):
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-#     case = models.ForeignKey("main.Message", on_delete=models.CASCADE, related_name="requested_support")
-#     sender = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="requested_support")
-#     assignment = models.ForeignKey(AssignedCase, on_delete=models.CASCADE, related="requested_support")
-#     agencies = models.ManyToManyField('main.Agency',  on_delete=models.CASCADE, related="requested_support")
-#     date_created = models.DateTimeField(auto_now_add=True)
-#     is_active=models.BooleanField(default=True)
+class RequestSupport(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    case = models.ForeignKey("main.Message", on_delete=models.CASCADE, related_name="requested_support")
+    sender = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="requested_support", null=True, blank=True)
+    assignment = models.ForeignKey(AssignedCase, on_delete=models.CASCADE, related_name="requested_support")
+    agencies = models.ManyToManyField('main.Agency', related_name="requested_support")
+    status = models.CharField(max_length=250, default="pending")
+    date_created = models.DateTimeField(auto_now_add=True)
+    is_active=models.BooleanField(default=True)
     
-#     class Meta:
-#         ordering = ["-date_created"]
+    class Meta:
+        ordering = ["-date_created"]
     
-#     def __str__(self) -> str:
-#         return self.assigned_case.responder.agency.acronym
+    def __str__(self) -> str:
+        return f"Request by {self.sender.email}"
     
+    @property
+    def case_detail(self):
+        return self.case
     
-#     def delete(self):
-#         self.is_active=False
-#         self.save()
+    @property
+    def agency_detail(self):
+        return self.agencies
+    
+    @property
+    def sender_detail(self):
+        return {"local_gov":self.sender.local_gov, "agency":self.sender.agency.acronym}
+    
+    def delete(self):
+        self.is_active=False
+        self.save()
+    
     
     
     

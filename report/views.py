@@ -2,9 +2,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 
-from .serializers import AssignedCaseSerializer, ReportSerializer
+from .serializers import AssignedCaseSerializer, ReportSerializer, RequestSupportSerializer
 from drf_yasg.utils import swagger_auto_schema
-from .models import AssignedCase, Report
+from .models import AssignedCase, Report, RequestSupport
 from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -185,7 +185,62 @@ def add_report(request, assigned_case_id):
                 "errors":serializer.errors
                 }
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+@swagger_auto_schema("post", request_body=RequestSupportSerializer())
+@api_view(['POST'])
+# @authentication_classes([JWTAuthentication])
+# @permission_classes([IsResponder])
+def request_backup(request):
+    if request.method == "POST":
+        serializer = RequestSupportSerializer(data=request.data)
 
+        if serializer.is_valid():
+    
+            
+            agencies_ = serializer.validated_data.pop("agencies")
+            
+            support = RequestSupport.objects.create(**serializer.validated_data)
+            support.agencies.set(agencies_)
+            support.sender=request.user
+            support.save()
+            
+            return Response({"message":"success"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"error":serializer.errors,"message":"failed"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    
 
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAdmin])
+def requested_backups(request):
+    if request.method == "GET":
+        requests = RequestSupport.objects.filter(is_active=True)
+        serializer = RequestSupportSerializer(requests, many=True)
+
+        
+        return Response({"message":"success", "data":serializer.data}, status=status.HTTP_200_OK)
+    
+    
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAdmin])
+def respond_to_request(request, request_id):
+    try:
+        obj = RequestSupport.objects.get(id=request_id, is_active=True, status="pending")
+        
+        
+        obj.status="approved"
+        obj.save()
+        return Response({"message":"successful"}, status=status.HTTP_202_ACCEPTED)
+        
+    except RequestSupport.DoesNotExist:
+        errors = {
+                "message":"failed",
+                "errors": f'Backup request not found'
+                }
+        return Response(errors, status=status.HTTP_404_NOT_FOUND)
+        
 # <User: desmond@gmail.com>, <User: admin@example.com>, <User: admin2@example.com>, <User: response@example.com>, <User: agent@example.com>]
 # password: qwertyuiop
