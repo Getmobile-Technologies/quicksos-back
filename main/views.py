@@ -259,7 +259,7 @@ def escalated_message(request):
         messages = Message.objects.filter(is_active=True, status="escalated",agencies=request.user.agency )
         
         if date:
-            messages = messages.filter(date_created__date=date)
+            messages = messages.filter(date_escalated__date=date)
             
         serializer = MessageSerializer(messages, many=True)
         data = {"message":"success",
