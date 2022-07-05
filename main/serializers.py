@@ -1,6 +1,9 @@
 from rest_framework import serializers
+
+from main.views import agencies
 from .models import Agency, Answer, Issue, Message, Question
 from rest_framework.exceptions import ValidationError
+from django.utils import timezone
 
 class PostAnswerSerializer(serializers.Serializer):
     question = serializers.UUIDField()
@@ -27,8 +30,15 @@ class MessageSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         responses = validated_data.pop("responses")
-        print(responses)
+        agencies = validated_data.pop("agencies", None)
         message = Message.objects.create(**validated_data)
+
+        if agencies:
+            message.agencies.set(agencies)
+            message.status = "escalated"
+            message.date_escalated = timezone.now()
+            message.save()
+            
         ans = [Answer(**response, message=message) for response in responses]
         Answer.objects.bulk_create(ans)   
         return message

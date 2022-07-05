@@ -28,14 +28,10 @@ def add_message(request):
         if serializer.is_valid():
     
             if serializer.validated_data.get("provider") == "call":
-                agencies_ = serializer.validated_data.pop("agencies")
+                agencies_ = serializer.validated_data.get("agencies")
                 if validate_responders(agencies_):
                     
-                    message_ = Message.objects.create(**serializer.validated_data)
-                    message_.agencies.set(agencies_)
-                    message_.status = "escalated"
-                    message_.date_escalated = timezone.now()
-                    message_.save()
+                    serializer.save()
             else:
     
                 serializer.save()
