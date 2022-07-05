@@ -52,7 +52,14 @@ def add_message(request):
 @permission_classes([IsAgentOrAdmin])
 def get_message(request):        
     if request.method == "GET":
+        
+        date = request.GET.get("filterDate")
+        
         messages = Message.objects.filter(is_active=True)
+        
+        if date:
+            messages = messages.filter(date_created__date=date)
+            
         serializer = MessageSerializer(messages, many=True)
         data = {"message":"success",
                 "data":serializer.data}
@@ -64,7 +71,15 @@ def get_message(request):
 @permission_classes([IsAgent])
 def pending_message(request):        
     if request.method == "GET":
+        date = request.GET.get("filterDate")
+        
         messages = Message.objects.filter(is_active=True, status = "pending")
+        
+        
+        
+        if date:
+            messages = messages.filter(date_created__date=date)
+            
         serializer = MessageSerializer(messages, many=True)
         data = {"message":"success",
                 "data":serializer.data}
@@ -243,7 +258,13 @@ def escalate(request, message_id):
 @permission_classes([IsEscalator])
 def escalated_message(request):        
     if request.method == "GET":
+        date = request.GET.get("filterDate")
+                
         messages = Message.objects.filter(is_active=True, status="escalated",agencies=request.user.agency )
+        
+        if date:
+            messages = messages.filter(date_created__date=date)
+            
         serializer = MessageSerializer(messages, many=True)
         data = {"message":"success",
                 "data":serializer.data}

@@ -189,8 +189,8 @@ def add_report(request, assigned_case_id):
         
 @swagger_auto_schema("post", request_body=RequestSupportSerializer())
 @api_view(['POST'])
-# @authentication_classes([JWTAuthentication])
-# @permission_classes([IsResponder])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsResponder])
 def request_backup(request):
     if request.method == "POST":
         serializer = RequestSupportSerializer(data=request.data)
