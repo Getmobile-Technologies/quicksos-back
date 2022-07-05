@@ -1,6 +1,4 @@
 from rest_framework import serializers
-
-from main.views import agencies
 from .models import Agency, Answer, Issue, Message, Question
 from rest_framework.exceptions import ValidationError
 from django.utils import timezone
