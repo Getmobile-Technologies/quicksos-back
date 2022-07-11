@@ -131,7 +131,7 @@ def has_arrived(request, assigned_case_id):
 @permission_classes([IsResponder])
 def add_report(request, assigned_case_id):
     try:
-        obj = AssignedCase.objects.get(id=assigned_case_id, is_active=True, status='pending', responded=True, arrived=True)
+        obj = AssignedCase.objects.get(id=assigned_case_id, is_active=True, responded=True, arrived=True)
     except AssignedCase.DoesNotExist:
         errors = {
                 "message":"failed",
