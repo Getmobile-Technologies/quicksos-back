@@ -307,7 +307,7 @@ def user_login(request):
                             user_logged_in.send(sender=user.__class__,
                                                 request=request, user=user)
                             
-                            if "firebase_key" in data:
+                            if "firebase_key" in data.keys():
                                 user.firebase_key = data.get("firebase_key")
                                 user.save()
                             
