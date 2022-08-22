@@ -46,6 +46,7 @@ class Message(models.Model):
     is_emergency = models.BooleanField(default=False)
     agent = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     agencies =  models.ManyToManyField(Agency, related_name="messages", blank=True)
+    local_gov = models.CharField(max_length=250, blank=True, null=True)
     agent_note = models.TextField(blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_escalated = models.DateTimeField(null=True)

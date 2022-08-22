@@ -91,6 +91,10 @@ class EscalateSerializer(serializers.ModelSerializer):
         if attrs.get('agent_note') == "" or attrs.get('agent_note')  is None:
             err["agent_note"] = "Please add note for escalators"
             error = True
+            
+        if attrs.get('local_gov') == "" or attrs.get('local_gov')  is None:
+            err["local_gov"] = "Please select the appropriate local government for this case."
+            error = True
         
         if error == True:
             
