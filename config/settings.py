@@ -25,7 +25,9 @@ load_dotenv(find_dotenv())
 class Common(Configuration):
     FIREBASE_CREDENTIALS = json.loads(os.getenv('FIREBASE_CREDENTIALS'))
     cred = credentials.Certificate(FIREBASE_CREDENTIALS)
-    firebase_admin.initialize_app(cred)
+    firebase_admin.initialize_app(cred,{
+        "databaseURL":"https://quicksos-be16b.firebaseio.com/"
+    })
     
     # Build paths inside the project like this: BASE_DIR / 'subdir'.
     BASE_DIR = Path(__file__).resolve().parent.parent

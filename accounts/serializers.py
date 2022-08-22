@@ -16,6 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=300)
+    firebase_key = serializers.CharField(max_length=1000, allow_blank=True)
     
     
 class ChangePasswordSerializer(serializers.Serializer):
@@ -29,6 +30,10 @@ class ChangePasswordSerializer(serializers.Serializer):
         if self.validated_data['new_password'] != self.validated_data['confirm_password']:
             raise serializers.ValidationError({"error":"Please enter matching passwords"})
         return True
+
+class ChangeFirebaseKey(serializers.Serializer):
+    firebase_key = serializers.CharField(max_length=1000, allow_blank=True)
     
+
     
 # class AddFirstResponder

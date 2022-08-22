@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status
 from accounts.permissions import IsAdmin
-from .serializers import ChangePasswordSerializer, LoginSerializer, UserSerializer
+from .serializers import ChangeFirebaseKey, ChangePasswordSerializer, LoginSerializer, UserSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, get_user_model
@@ -25,7 +25,7 @@ User = get_user_model()
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAdmin])
 def add_admin(request):
-    
+    """Alllows the super admin to create other admin users for the application."""
 
     if request.method == 'POST':
         
@@ -238,6 +238,7 @@ def user_detail(request):
 @permission_classes([IsAdmin])
 def get_user_detail(request, user_id):
     """Allows the admin to view user profile or deactivate user's account. """
+    
     try:
         user = User.objects.get(id = user_id, is_active=True)
     
@@ -305,12 +306,18 @@ def user_login(request):
                             user_detail['refresh'] = str(refresh)
                             user_logged_in.send(sender=user.__class__,
                                                 request=request, user=user)
-
+                            
+                            if "firebase_key" in data:
+                                user.firebase_key = data.get("firebase_key")
+                                user.save()
+                            
                             data = {
         
                             "message":"success",
                             'data' : user_detail,
                             }
+                            
+                           
                             return Response(data, status=status.HTTP_200_OK)
                         
 
@@ -346,6 +353,7 @@ def user_login(request):
 @permission_classes([IsAuthenticated])   
 def reset_password(request):
     """Allows users to edit password when logged in."""
+    
     user = request.user
     if request.method == 'POST':
         serializer = ChangePasswordSerializer(data = request.data)
@@ -386,3 +394,18 @@ def reset_password(request):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)   
         
 
+
+@swagger_auto_schema(methods=['POST'], request_body=ChangeFirebaseKey())
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated]) 
+def change_firebase_key(request):
+    """This function is used to change the firebase key for a user to be able to send push notification"""
+    
+    user = request.user
+    serializer = ChangeFirebaseKey(data=request.data)
+    serializer.is_Valid()
+    user.firebase_key = serializer.validated_data.get("firebase_key")
+    user.save()
+    
+    return Response({}, status=status.HTTP_204_NO_CONTENT)   

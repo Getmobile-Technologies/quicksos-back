@@ -43,6 +43,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser      = models.BooleanField(_('superuser'), default= False)
     is_active     = models.BooleanField(_('active'), default=True)
     date_joined   = models.DateTimeField(_('date joined'), auto_now_add=True)
+    firebase_key = models.TextField(null=True, blank=True)
+    
     auth_provider = models.CharField(
         max_length=255, blank=False,
         null=False, default=AUTH_PROVIDERS.get('email'))

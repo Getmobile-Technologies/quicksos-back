@@ -4,8 +4,8 @@ from pathlib import Path
 
 def send_notification(notice_for, user):
     
+    # firebase_key = user.firebase_key
     firebase_key = user.firebase_key
-    
     
     if notice_for == "new_case":
         title = 'New Emergency'
@@ -38,6 +38,7 @@ def send_notification(notice_for, user):
     
     try:
         response = messaging.send(message)
+        print(response.json())
     except Exception as e:
         pass
         
