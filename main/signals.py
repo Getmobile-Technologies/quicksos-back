@@ -45,7 +45,7 @@ QuickSOS Team.
         
         # print(recipient_list)
         # print(instance.password)
-        escalator_keys =[b.members.filter(role="escalator").values_list("firebase_keys", flat=True) for b in instance.agencies.all()] 
+        escalator_keys =get_data([b.members.filter(role="escalator").values_list("firebase_keys", flat=True) for b in instance.agencies.all()]) 
         
         for key in escalator_keys:
             send_push_notification("escalated", key)
