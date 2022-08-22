@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=300)
-    firebase_key = serializers.CharField(max_length=1000, blank=True)
+    firebase_key = serializers.CharField(max_length=1000, allow_blank=True, required=False)
     
     
 class ChangePasswordSerializer(serializers.Serializer):
