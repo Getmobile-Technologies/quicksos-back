@@ -6,7 +6,7 @@ from config import settings
 from rest_framework import serializers
 from django.template.loader import render_to_string
 from main.models import Message
-from helpers.push_notifications import send_push_notification
+from main.helpers.push_notifications import send_push_notification
 
 domain = 'quicksos.com'
 url='#'
@@ -45,7 +45,7 @@ QuickSOS Team.
         
         # print(recipient_list)
         # print(instance.password)
-        escalator_keys =get_data([b.members.filter(role="escalator").values_list("firebase_keys", flat=True) for b in instance.agencies.all()]) 
+        escalator_keys =get_data([b.members.filter(role="escalator").values_list("firebase_key", flat=True) for b in instance.agencies.all()]) 
         
         for key in escalator_keys:
             send_push_notification("escalated", key)
