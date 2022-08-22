@@ -2,10 +2,9 @@ from firebase_admin import messaging
 from django.utils import timezone
 from pathlib import Path
 
-def send_notification(notice_for, user):
-    
+def send_push_notification(notice_for, user_key):
+    """ Sends push notification to a user's firebase key."""
     # firebase_key = user.firebase_key
-    firebase_key = user.firebase_key
     
     if notice_for == "new_case":
         title = 'New Emergency'
@@ -26,7 +25,7 @@ def send_notification(notice_for, user):
         body=""
     
     message = messaging.Message(
-        token=firebase_key,
+        token=user_key,
         notification=messaging.Notification(
             title=title,
             body=body,
