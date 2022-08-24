@@ -14,8 +14,6 @@ from rest_framework.authentication import TokenAuthentication
 from .helpers.check_agency import validate_responders
 
 
-
-
 @swagger_auto_schema("post", request_body=MessageSerializer())
 @api_view(["POST"])
 @authentication_classes([JWTAuthentication, TokenAuthentication])
