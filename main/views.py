@@ -450,3 +450,32 @@ def question_detail(request, question_id):
                 }
             
         return Response(data, status=status.HTTP_204_NO_CONTENT)
+    
+    
+@api_view(["GET"])
+def dashboard_view(request):
+    
+    #get escalated cases by agencies
+    
+    local_gov = request.GET.get("local_gov")
+
+    
+    agencies = Agency.objects.filter(is_active=True).values_list(flat=True)
+    
+    data = {agency.acronym:agency.messages.count() for agency in agencies}
+    
+    if local_gov:
+        data = {agency.acronym:agency.messages.filter(local_gov=local_gov).count() for agency in agencies}
+        
+    
+    data = {
+                "message":"success"
+                }
+            
+    return Response(data, status=status.HTTP_200_OK)
+    
+    
+    
+    
+    
+    
