@@ -460,7 +460,7 @@ def dashboard_view(request):
     local_gov = request.GET.get("local_gov")
 
     
-    agencies = Agency.objects.filter(is_active=True).values_list(flat=True)
+    agencies = Agency.objects.filter(is_active=True)
     
     data = {agency.acronym:agency.messages.count() for agency in agencies}
     
