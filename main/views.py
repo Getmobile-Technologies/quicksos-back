@@ -462,15 +462,18 @@ def dashboard_view(request):
     
     agencies = Agency.objects.filter(is_active=True)
     
-    data = {agency.acronym:agency.messages.count() for agency in agencies}
+    
     
     if local_gov:
-        data = {agency.acronym:agency.messages.filter(local_gov=local_gov).count() for agency in agencies}
+        escalation_by_agencies = {agency.acronym:agency.messages.filter(local_gov=local_gov).count() for agency in agencies}
         
-    
+    else:
+        escalation_by_agencies = {agency.acronym:agency.messages.count() for agency in agencies}
+        
     data = {
-                "message":"success"
-                }
+        "message":"success",
+        "escalation_by_agencies": escalation_by_agencies
+    }
             
     return Response(data, status=status.HTTP_200_OK)
     
