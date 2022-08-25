@@ -236,6 +236,12 @@ def escalate(request, message_id):
                 obj.agent = request.user
                 obj.status= "escalated"
                 obj.date_escalated = timezone.now()
+                obj.local_gov = serializer.validated_data.get('local_gov')
+                obj.agent_note = serializer.validated_data.get('agent_note')
+                
+                is_emergency = serializer.validated_data.get('is_emergency')
+                if is_emergency:
+                    obj.is_emergency = is_emergency
                 
                 obj.save()
             
@@ -453,26 +459,72 @@ def question_detail(request, question_id):
     
     
 @api_view(["GET"])
-def dashboard_view(request):
+def escalated_cases_by_agency(request):
+    """Provides analytics for cases escalated to agencies. Allows parameters to filter by local_gov, month and year."""
+    
+    #get escalated cases by agencies    
+    
+    local_gov = request.GET.get("local_gov")
+    month = request.GET.get("month")
+    year = request.GET.get("year")
+
+    
+    agencies = Agency.objects.filter(is_active=True)
+    messages = Message.objects.filter(is_active=True)
+    
+    if local_gov:
+        messages = messages.filter(local_gov=local_gov)
+        
+    if month:
+        messages = messages.filter(date_escalated__month=month)
+    
+    if year:
+        messages = messages.filter(date_escalated__year=year)
+        
+    
+    escalation_by_agencies = {agency.acronym: messages.filter(agencies=agency).count() for agency in agencies }
+    
+    
+
+    data = {
+        "message":"success",
+        "escalation_by_agencies": escalation_by_agencies
+    }
+            
+    return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def reported_cases_by_issues(request):
+    """Provides analytics for cases reported. Allows parameters to filter by local_gov, month and year."""
     
     #get escalated cases by agencies
     
     local_gov = request.GET.get("local_gov")
+    month = request.GET.get("month")
+    year = request.GET.get("year")
 
     
-    agencies = Agency.objects.filter(is_active=True)
-    
-    
+    issues = Issue.objects.filter(is_active=True)
+    messages = Message.objects.filter(is_active=True)
     
     if local_gov:
-        escalation_by_agencies = {agency.acronym:agency.messages.filter(local_gov=local_gov).count() for agency in agencies}
+        messages = messages.filter(local_gov=local_gov)
         
-    else:
-        escalation_by_agencies = {agency.acronym:agency.messages.count() for agency in agencies}
+    if month:
+        messages = messages.filter(date_created__month=month)
+    
+    if year:
+        messages = messages.filter(date_created__year=year)
         
+    
+    report = {issue.name: len(list(filter(lambda message : message.answers.first().question.issue == issue, messages))) for issue in issues }
+    
+    
+
     data = {
         "message":"success",
-        "escalation_by_agencies": escalation_by_agencies
+        "report_by_cases": report
     }
             
     return Response(data, status=status.HTTP_200_OK)

@@ -16,5 +16,8 @@ urlpatterns = [
     path("issues/", views.issues),
     path("issues/<uuid:issue_id>/", views.issue_detail),
     path("questions/<uuid:question_id>/", views.question_detail),  
-    path("dashboard/", views.dashboard_view)
+    path("dashboard/escalated_cases_by_agency/", views.escalated_cases_by_agency),
+    path("dashboard/reported_cases_by_issues/", views.reported_cases_by_issues),
+    
+    
 ]
