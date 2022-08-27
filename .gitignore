@@ -91,3 +91,4 @@ quicksos-dev-cred.json
 venv
 Pipfile.lock
 Pipfile
+requireement.txt
