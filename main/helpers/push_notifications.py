@@ -9,12 +9,10 @@ def send_push_notification(notice_for, user_key):
     if notice_for == "new_case":
         title = 'New Emergency'
         body = "Hurry! A new emergency occurred."
+        
     elif notice_for == "escalated":
         title = 'Escalated Emergency'
         body = "Hurry! A new emergency has was just escalated."
-    elif notice_for == "assigned_case":
-        title = 'New case assigned'
-        body = "Hurry! A new case has been assigned to you"
         
     elif notice_for == "new_request":
         title = 'New request'

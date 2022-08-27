@@ -8,6 +8,9 @@ from rest_framework import serializers
 from django.template.loader import render_to_string
 from main.models import Message
 from main.helpers.push_notifications import send_push_notification
+from report.models import AssignedCase
+from report.serializers import AssignedCaseSerializer
+from main.helpers.firebase_store import send_mobile_notification
 
 domain = 'quicksos.com'
 url='#'
@@ -88,3 +91,15 @@ QuickSOS Team.
         
         
         return
+    
+    
+@receiver(post_save, sender=AssignedCase)
+def send_responder_notification(sender,instance, created, **kwargs):
+    if created:
+        send_mobile_notification(instance.responder.id)
+        
+        
+        
+        
+    return
+    
