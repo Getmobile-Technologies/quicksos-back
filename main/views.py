@@ -470,7 +470,13 @@ def escalated_cases_by_agency(request):
 
     
     agencies = Agency.objects.filter(is_active=True)
-    messages = Message.objects.filter(is_active=True)
+        
+    if month or year or local_gov:
+        messages = Message.objects.filter(is_active=True)
+    else:
+        today = timezone.now().date()
+        messages = Message.objects.filter(is_active=True, date_escalated__date = today)
+        
     
     if local_gov:
         messages = messages.filter(local_gov=local_gov)
@@ -506,7 +512,12 @@ def reported_cases_by_issues(request):
 
     
     issues = Issue.objects.filter(is_active=True)
-    messages = Message.objects.filter(is_active=True)
+    
+    if month or year or local_gov:
+        messages = Message.objects.filter(is_active=True)
+    else:
+        today = timezone.now().date()
+        messages = Message.objects.filter(is_active=True, date_created__date = today)
     
     if local_gov:
         messages = messages.filter(local_gov=local_gov)
