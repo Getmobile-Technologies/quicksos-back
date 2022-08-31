@@ -28,7 +28,7 @@ def get_data(queryset):
 @receiver(post_save, sender=Message)
 def send_notification(sender, instance, created, **kwargs):
     if instance.status=="escalated":
-        escalators =[b.members.filter(role="escalator").values_list("email", flat=True) for b in instance.agencies.all()] 
+        escalators =[b.members.filter(role="escalator").values_list("email", flat=True) for b in instance.emergency_code.agency.all()] 
         
         subject = f"New Emergency Escalated"
         
@@ -49,7 +49,8 @@ QuickSOS Team.
         
         # print(recipient_list)
         # print(instance.password)
-        escalator_keys =get_data([b.members.filter(role="escalator").values_list("firebase_key", flat=True) for b in instance.agencies.all()]) 
+        
+        escalator_keys =get_data([b.members.filter(role="escalator").values_list("firebase_key", flat=True) for b in instance.emergency_code.agency.all()]) 
         
         for key in escalator_keys:
             send_push_notification("escalated", key)

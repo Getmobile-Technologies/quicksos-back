@@ -79,7 +79,7 @@ class EscalateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Message
-        fields = ['agencies', 'agent_note', "local_gov", "is_emergency"]
+        fields = ['emergency_code', 'agent_note', "local_gov", "is_emergency"]
         
         
     def validate(self, attrs):

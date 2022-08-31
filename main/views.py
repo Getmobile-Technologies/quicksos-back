@@ -42,8 +42,8 @@ def add_message(request):
     
 
 @api_view(["GET"])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAgentOrAdmin])
+# @authentication_classes([JWTAuthentication])
+# @permission_classes([IsAgentOrAdmin])
 def get_message(request):        
     if request.method == "GET":
         

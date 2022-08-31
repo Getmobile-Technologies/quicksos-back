@@ -45,7 +45,7 @@ class Message(models.Model):
     address = models.TextField(null=True,blank=True)
     is_emergency = models.BooleanField(default=False)
     agent = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
-    agencies =  models.ManyToManyField(Agency, related_name="messages", blank=True)
+    emergency_code = models.ForeignKey("main.EmergencyCode", related_name="emergency_codes", blank=True, on_delete=models.CASCADE, null=True)
     local_gov = models.CharField(max_length=250, blank=True, null=True)
     agent_note = models.TextField(blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -70,7 +70,7 @@ class Message(models.Model):
     
     @property
     def agency_detail(self):
-        return self.agencies.values("acronym")
+        return self.emergency_codes.agency.values("acronym")
     
     def delete(self):
         self.is_active=False
@@ -135,5 +135,18 @@ class Answer(models.Model):
     def delete(self):
         self.is_active=False
         self.save()
+        
+        
+class EmergencyCode(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    code = models.CharField(max_length=255, unique=True)
+    agency = models.ManyToManyField("main.agency", related_name="codes")
+    date_created = models.DateTimeField(auto_now_add=True)
+   
+    def __str__(self):
+        return self.code
     
     
+    def delete(self):
+        self.is_active=False
+        self.save()
