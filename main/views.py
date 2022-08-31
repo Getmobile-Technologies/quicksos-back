@@ -469,11 +469,13 @@ def escalated_cases_by_agency(request):
     local_gov = request.GET.get("local_gov")
     month = request.GET.get("month")
     year = request.GET.get("year")
+    start_date = request.GET.get("startDate")
+    end_date = request.GET.get("endDate")
 
     
     agencies = Agency.objects.filter(is_active=True)
         
-    if month or year or local_gov:
+    if month or year or local_gov or start_date or end_date:
         messages = Message.objects.filter(is_active=True)
     else:
         today = timezone.now().date()
@@ -488,6 +490,12 @@ def escalated_cases_by_agency(request):
     
     if year:
         messages = messages.filter(date_escalated__year=year)
+        
+    if start_date:
+        messages = messages.filter(date_created__date__gte=start_date)
+    
+    if end_date:
+        messages = messages.filter(date_created__date__lte=end_date)
         
     
     escalation_by_agencies = {agency.acronym: messages.filter(emergency_code__agency=agency).count() for agency in agencies if messages.filter(emergency_code__agency=agency).count() > 0 }
@@ -510,11 +518,14 @@ def reported_cases_by_issues(request):
     local_gov = request.GET.get("local_gov")
     month = request.GET.get("month")
     year = request.GET.get("year")
+    
+    start_date = request.GET.get("startDate")
+    end_date = request.GET.get("endDate")
 
     
     issues = Issue.objects.filter(is_active=True)
     
-    if month or year or local_gov:
+    if month or year or local_gov or start_date or end_date:
         messages = Message.objects.filter(is_active=True)
     else:
         today = timezone.now().date()
@@ -528,6 +539,12 @@ def reported_cases_by_issues(request):
     
     if year:
         messages = messages.filter(date_created__year=year)
+        
+    if start_date:
+        messages = messages.filter(date_created__date__gte=start_date)
+    
+    if end_date:
+        messages = messages.filter(date_created__date__lte=end_date)
         
     
     
