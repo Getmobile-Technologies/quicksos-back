@@ -529,13 +529,19 @@ def reported_cases_by_issues(request):
         messages = messages.filter(date_created__year=year)
         
     
-    report = {issue.name: len(list(filter(lambda message : message.answers.first().question.issue == issue, messages))) for issue in issues }
     
-    
+    report = {}
+    for issue in issues:
+        total = len(list(filter(lambda message : message.answers.first().question.issue == issue, messages)))
+        
+        if total > 0:
+            report[issue.name] = total
+        else:
+            continue
 
     data = {
         "message":"success",
-        "report_by_cases": report
+        "report_by_cases": report,
     }
             
     return Response(data, status=status.HTTP_200_OK)
