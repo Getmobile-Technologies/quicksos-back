@@ -475,7 +475,7 @@ def escalated_cases_by_agency(request):
     
     agencies = Agency.objects.filter(is_active=True)
         
-    if month or year or local_gov or start_date or end_date:
+    if month or year or start_date or end_date:
         messages = Message.objects.filter(is_active=True)
     else:
         today = timezone.now().date()
@@ -525,7 +525,7 @@ def reported_cases_by_issues(request):
     
     issues = Issue.objects.filter(is_active=True)
     
-    if month or year or local_gov or start_date or end_date:
+    if month or year or start_date or end_date:
         messages = Message.objects.filter(is_active=True)
     else:
         today = timezone.now().date()
