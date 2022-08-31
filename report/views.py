@@ -54,7 +54,7 @@ def assigned_cases(request):
         if request.user.role == "escalator":
             obj = AssignedCase.objects.filter(responder__agency=request.user.agency, is_active=True)
         elif request.user.role == "first_responder":
-            obj = AssignedCase.objects.filter(responder=request.user, is_active=True) 
+            obj = AssignedCase.objects.filter(responder=request.user, is_active=True).exclude(status="complete")
         else:
             raise PermissionDenied({"error":"You do not have the permission to view this"})
         
