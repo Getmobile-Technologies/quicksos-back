@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 from django.contrib.auth import get_user_model
 from accounts.models import phone_regex
+from django.utils import timezone
 # Create your models here.
 
 User = get_user_model()
@@ -37,13 +38,17 @@ class Message(models.Model):
     PROVIDERS = (("whatsapp", "Whatsapp"), 
                  ("call", "Call"))
     
+    CATEGORY_CHOICES = (("emergency", "Emergency"),
+                        ("non_emergency", "Non-Emergency"),
+                        ("hoax", "Hoax"))
+    
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=300)
     phone = models.CharField(max_length=15,  validators=[phone_regex])
     status = models.CharField(max_length=300, default="pending", choices=STATUS)
     address = models.TextField(null=True,blank=True)
-    is_emergency = models.BooleanField(default=False)
+    category = models.CharField(max_length=100, blank=True, null=True, choices=CATEGORY_CHOICES)
     agent = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     emergency_code = models.ForeignKey("main.EmergencyCode", related_name="emergency_codes", blank=True, on_delete=models.CASCADE, null=True)
     local_gov = models.CharField(max_length=250, blank=True, null=True)
@@ -92,6 +97,13 @@ class Issue(models.Model):
     @property
     def question_list(self):
         return self.questions.filter(is_active=True).values("id", "question", "is_image")
+    
+    @property
+    def case_count(self):
+        today = timezone.now().date()
+        messages = Message.objects.filter(is_active=True, date_created__date=today)
+        total = len(list(filter(lambda message : message.answers.first().question.issue.id == self.id, messages)))
+        return total
     
     
     def delete(self):
@@ -142,6 +154,7 @@ class EmergencyCode(models.Model):
     code = models.CharField(max_length=255, unique=True)
     agency = models.ManyToManyField("main.agency", related_name="codes")
     date_created = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
    
     def __str__(self):
         return self.code
