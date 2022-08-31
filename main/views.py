@@ -488,10 +488,9 @@ def escalated_cases_by_agency(request):
         messages = messages.filter(date_escalated__year=year)
         
     
-    escalation_by_agencies = {agency.acronym: messages.filter(agencies=agency).count() for agency in agencies }
+    escalation_by_agencies = {agency.acronym: messages.filter(agencies=agency).count() for agency in agencies if messages.filter(agencies=agency).count() > 0 }
     
     
-
     data = {
         "message":"success",
         "escalation_by_agencies": escalation_by_agencies
