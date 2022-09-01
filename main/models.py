@@ -24,7 +24,7 @@ class Agency(models.Model):
         self.save()
         
         self.members.all().update(is_active=False) #deactivate all users associated with this escalator i.e first responders and admin
-        self.members.save()
+        # self.members.save()
         
         return
     
