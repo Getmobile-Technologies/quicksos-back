@@ -548,7 +548,9 @@ def reported_cases_by_issues(request):
     
     
     report = {}
+    messages = list(filter(lambda x: x.answers.first() is not None, messages))
     for issue in issues:
+        
         total = len(list(filter(lambda message : message.answers.first().question.issue == issue, messages)))
         
         if total > 0:
