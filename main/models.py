@@ -102,7 +102,7 @@ class Issue(models.Model):
     def case_count(self):
         today = timezone.now().date()
         messages = Message.objects.filter(is_active=True, date_created__date=today)
-        messages = list(filter(lambda x: x.answers.first().question is not None, messages))
+        messages = list(filter(lambda x: x.answers.first() is not None, messages))
         total = len(list(filter(lambda message : message.answers.first().question.issue.id == self.id, messages)))
         return total
     
