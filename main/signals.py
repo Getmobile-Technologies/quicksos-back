@@ -28,24 +28,24 @@ def get_data(queryset):
 @receiver(post_save, sender=Message)
 def send_notification(sender, instance, created, **kwargs):
     if instance.status=="escalated":
-        escalators =[b.members.filter(role="escalator").values_list("email", flat=True) for b in instance.emergency_code.agency.all() if instance.emergency_code] 
+#         escalators =[b.members.filter(role="escalator").values_list("email", flat=True) for b in instance.emergency_code.agency.all() if instance.emergency_code] 
         
-        subject = f"New Emergency Escalated"
+#         subject = f"New Emergency Escalated"
         
-        message = f"""Hello,
-A new emergency has just been escalated to you. Quickly respond to this immediately.
+#         message = f"""Hello,
+# A new emergency has just been escalated to you. Quickly respond to this immediately.
 
-Cheers,
-QuickSOS Team.       
-"""   
+# Cheers,
+# QuickSOS Team.       
+# """   
         # msg_html = render_to_string('signup_email.html', {
         #                 'first_name': str(instance.first_name).title(),
         #                 'code':code,
         #                 'url':url})
         
-        email_from = settings.Common.DEFAULT_FROM_EMAIL
-        recipient_list = get_data(escalators)
-        send_mail( subject, message, email_from, recipient_list)
+        # email_from = settings.Common.DEFAULT_FROM_EMAIL
+        # recipient_list = get_data(escalators)
+        # send_mail( subject, message, email_from, recipient_list)
         
         # print(recipient_list)
         # print(instance.password)
