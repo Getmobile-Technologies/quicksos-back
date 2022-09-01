@@ -26,9 +26,8 @@ def add_message(request):
         if serializer.is_valid():
     
             if serializer.validated_data.get("provider") == "call":
-                agencies_ = serializer.validated_data.get("agencies")
-                if validate_responders(agencies_):
-                    
+                emergency_code = serializer.validated_data.get('emergency_code')
+                if validate_responders(emergency_code.agency):
                     serializer.save()
             else:
     

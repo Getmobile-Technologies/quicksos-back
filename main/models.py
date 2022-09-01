@@ -152,7 +152,7 @@ class Answer(models.Model):
 class EmergencyCode(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     code = models.CharField(max_length=255, unique=True)
-    agency = models.ManyToManyField("main.agency", related_name="codes")
+    agency = models.ManyToManyField("main.Agency", related_name="codes")
     date_created = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
    
