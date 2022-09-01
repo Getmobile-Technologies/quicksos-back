@@ -28,7 +28,7 @@ def get_data(queryset):
 @receiver(post_save, sender=Message)
 def send_notification(sender, instance, created, **kwargs):
     if instance.status=="escalated":
-        escalators =[b.members.filter(role="escalator").values_list("email", flat=True) for b in instance.emergency_code.agency.all()] 
+        escalators =[b.members.filter(role="escalator").values_list("email", flat=True) for b in instance.emergency_code.agency.all() if instance.emergency_code] 
         
         subject = f"New Emergency Escalated"
         
