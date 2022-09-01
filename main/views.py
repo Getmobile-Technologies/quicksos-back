@@ -27,7 +27,7 @@ def add_message(request):
     
             if serializer.validated_data.get("provider") == "call":
                 emergency_code = serializer.validated_data.get('emergency_code')
-                if validate_responders(emergency_code.agency):
+                if validate_responders(emergency_code.agency.all()):
                     serializer.save()
             else:
     
@@ -230,7 +230,7 @@ def escalate(request, message_id):
             emergency_code = serializer.validated_data.get('emergency_code')
             
             #check all the agencies to be escalated to, if any does not have an escalator, raise an error.
-            if validate_responders(emergency_code.agency):
+            if validate_responders(emergency_code.agency.all()):
                     
                 # print(request.user)
                 obj.agent = request.user
