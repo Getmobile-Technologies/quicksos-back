@@ -79,7 +79,7 @@ class EscalateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Message
-        fields = ['emergency_code', 'agent_note', "local_gov", "category"]
+        fields = ['emergency_code', 'agent_note', "category"]
         
         
     def validate(self, attrs):
@@ -92,9 +92,9 @@ class EscalateSerializer(serializers.ModelSerializer):
             err["agent_note"] = "Please add note for escalators"
             error = True
             
-        if attrs.get('local_gov') == "" or attrs.get('local_gov')  is None:
-            err["local_gov"] = "Please select the appropriate local government for this case."
-            error = True
+        # if attrs.get('local_gov') == "" or attrs.get('local_gov')  is None:
+        #     err["local_gov"] = "Please select the appropriate local government for this case."
+        #     error = True
             
         if attrs.get('category') == "" or attrs.get('category')  is None:
             err['category'] = "Please select a category for this case"
