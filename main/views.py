@@ -585,9 +585,9 @@ def dashboard(request):
     data = {
         "message":"success",
         "reported_cases": messages.count(),
-        "pending" : messages.filter(status="pending"),
-        "escalated" : messages.filter(status="escalated"),
-        "completed" : messages.filter(status="completed"),
+        "pending" : messages.filter(status="pending").count(),
+        "escalated" : messages.filter(status="escalated").count(),
+        "completed" : messages.filter(status="completed").count(),
         
     }
             
