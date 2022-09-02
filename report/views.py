@@ -177,6 +177,10 @@ def add_report(request, assigned_case_id):
            
             obj.status = "complete"
             obj.save()
+            
+            if request.user.agency.acronym == "LASEMA": #TODO: add field to distinguish supervising agency in the agency DB
+                obj.case.status = "completed"
+                obj.case.save()
                 
             return Response({"message":"successful"}, status=status.HTTP_202_ACCEPTED)
         else:
