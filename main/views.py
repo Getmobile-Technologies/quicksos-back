@@ -566,7 +566,33 @@ def reported_cases_by_issues(request):
     return Response(data, status=status.HTTP_200_OK)
     
     
+
+@api_view(["GET"])
+def dashboard(request):
+    """Provides analytics for cases reported today"""
     
+    #get escalated cases by agencies
+    
+   
+    today = timezone.now().date()
+    messages = Message.objects.filter(is_active=True, date_created__date = today)
+    
+        
+    
+    
+   
+
+    data = {
+        "message":"success",
+        "reported_cases": messages.count(),
+        "pending" : messages.filter(status="pending"),
+        "escalated" : messages.filter(status="escalated"),
+        "completed" : messages.filter(status="completed"),
+        
+    }
+            
+    return Response(data, status=status.HTTP_200_OK)
+
     
     
 

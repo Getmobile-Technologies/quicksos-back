@@ -18,6 +18,7 @@ urlpatterns = [
     path("questions/<uuid:question_id>/", views.question_detail),  
     path("dashboard/escalated_cases_by_agency/", views.escalated_cases_by_agency),
     path("dashboard/reported_cases_by_issues/", views.reported_cases_by_issues),
+    path("dashboard/", views.dashboard),
     path("emergency_codes/", views.emergency_codes),
     
     
