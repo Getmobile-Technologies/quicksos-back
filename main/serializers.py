@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Agency, Answer, Issue, Message, Question
+from .models import Agency, Answer, EmergencyCode, Issue, Message, Question
 from rest_framework.exceptions import ValidationError
 from django.utils import timezone
 
@@ -28,11 +28,10 @@ class MessageSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         responses = validated_data.pop("responses")
-        agencies = validated_data.pop("agencies", None)
+        emergency_code = validated_data.pop("emergency_code", None)
         message = Message.objects.create(**validated_data)
 
-        if agencies:
-            message.agencies.set(agencies)
+        if emergency_code:
             message.status = "escalated"
             message.date_escalated = timezone.now()
             message.save()
@@ -49,6 +48,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 class IssueSerializer(serializers.ModelSerializer):
     question_list = serializers.ReadOnlyField()
     questions= QuestionSerializer(many=True, write_only=True)
+    case_count = serializers.ReadOnlyField()
     class Meta:
         model = Issue
         fields = '__all__'
@@ -79,25 +79,37 @@ class EscalateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Message
-        fields = ['agencies', 'agent_note', "local_gov", "is_emergency"]
+        fields = ['emergency_code', 'agent_note', "category"]
         
         
     def validate(self, attrs):
         err = {}
         error = False
-        if  attrs.get('agent_note') is None or len(attrs.get('agent_note')) <= 0:
-            err['agencies'] = "Please add agencies you want to escalate to."
+        if  attrs.get('emergency_code') is None:
+            err['emergency_code'] = "Please select an emergency code for this case."
             error = True
         if attrs.get('agent_note') == "" or attrs.get('agent_note')  is None:
             err["agent_note"] = "Please add note for escalators"
             error = True
             
-        if attrs.get('local_gov') == "" or attrs.get('local_gov')  is None:
-            err["local_gov"] = "Please select the appropriate local government for this case."
+        # if attrs.get('local_gov') == "" or attrs.get('local_gov')  is None:
+        #     err["local_gov"] = "Please select the appropriate local government for this case."
+        #     error = True
+            
+        if attrs.get('category') == "" or attrs.get('category')  is None:
+            err['category'] = "Please select a category for this case"
             error = True
         
+            
         if error == True:
             
             raise ValidationError(err)
         else:
             return attrs
+        
+        
+class EmergencyCodeSerializer(serializers.ModelSerializer):
+    agency = AgencySerializer(many=True, read_only=True)
+    class Meta:
+        model = EmergencyCode
+        fields = '__all__'

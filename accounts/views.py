@@ -12,6 +12,7 @@ from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.signals import user_logged_in
 from .helpers.generators import generate_password
+from django.contrib.auth.hashers import make_password
 import cloudinary
 import cloudinary.uploader
 
@@ -233,7 +234,7 @@ def user_detail(request):
         return Response(data, status = status.HTTP_204_NO_CONTENT)
     
 
-@api_view(['GET', 'DELETE'])
+@api_view(['GET', 'PUT','DELETE'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAdmin])
 def get_user_detail(request, user_id):
@@ -259,6 +260,34 @@ def get_user_detail(request, user_id):
             }
 
         return Response(data, status=status.HTTP_200_OK)
+    
+    elif request.method == 'PUT':
+        serializer = UserSerializer(user, data = request.data, partial=True) 
+
+        if serializer.is_valid():
+            
+            
+            #upload profile picture
+            if 'password' in serializer.validated_data.keys():
+                serializer.validated_data["password"] = make_password(serializer.validated_data.get("password"))
+            
+            serializer.save()
+
+            data = {
+                "message":"success",
+                'data' : serializer.data,
+            }
+
+            return Response(data, status = status.HTTP_201_CREATED)
+
+        else:
+            data = {
+                
+                "message":"failed",
+                'error' : serializer.errors,
+            }
+
+            return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
     #delete the account
     elif request.method == 'DELETE':

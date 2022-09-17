@@ -2,9 +2,9 @@ from django.forms import model_to_dict
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
-from .serializers import EscalateSerializer, AgencySerializer, IssueSerializer, MessageSerializer
+from .serializers import EmergencyCodeSerializer, EscalateSerializer, AgencySerializer, IssueSerializer, MessageSerializer
 from drf_yasg.utils import swagger_auto_schema
-from .models import Agency, Issue, Message, Question, User
+from .models import Agency, EmergencyCode, Issue, Message, Question, User
 from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -26,9 +26,8 @@ def add_message(request):
         if serializer.is_valid():
     
             if serializer.validated_data.get("provider") == "call":
-                agencies_ = serializer.validated_data.get("agencies")
-                if validate_responders(agencies_):
-                    
+                emergency_code = serializer.validated_data.get('emergency_code')
+                if validate_responders(emergency_code.agency.all()):
                     serializer.save()
             else:
     
@@ -60,6 +59,7 @@ def get_message(request):
         
         return Response(data,status=status.HTTP_200_OK)
     
+    
 @api_view(["GET"])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAgent])
@@ -79,6 +79,7 @@ def pending_message(request):
                 "data":serializer.data}
         
         return Response(data,status=status.HTTP_200_OK)
+    
     
 @api_view(["GET", "PUT", "DELETE"])
 @authentication_classes([JWTAuthentication])
@@ -226,22 +227,20 @@ def escalate(request, message_id):
         serializer = EscalateSerializer(data=request.data)
         
         if serializer.is_valid():
-            agencies_ = serializer.validated_data.get('agencies')
+            emergency_code = serializer.validated_data.get('emergency_code')
             
             #check all the agencies to be escalated to, if any does not have an escalator, raise an error.
-            if validate_responders(agencies_):
+            if validate_responders(emergency_code.agency.all()):
                     
-                obj.agencies.set(agencies_)
                 # print(request.user)
                 obj.agent = request.user
+                obj.emergency_code = emergency_code
                 obj.status= "escalated"
                 obj.date_escalated = timezone.now()
                 obj.local_gov = serializer.validated_data.get('local_gov')
                 obj.agent_note = serializer.validated_data.get('agent_note')
                 
-                is_emergency = serializer.validated_data.get('is_emergency')
-                if is_emergency:
-                    obj.is_emergency = is_emergency
+                obj.category = serializer.validated_data.get('category')
                 
                 obj.save()
             
@@ -253,6 +252,7 @@ def escalate(request, message_id):
                 }
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(["GET"])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsEscalator])
@@ -260,7 +260,7 @@ def escalated_message(request):
     if request.method == "GET":
         date = request.GET.get("filterDate")
                 
-        messages = Message.objects.filter(is_active=True, status="escalated",agencies=request.user.agency )
+        messages = Message.objects.filter(is_active=True, status="escalated",emergency_code__agency=request.user.agency )
         
         if date:
             messages = messages.filter(date_escalated__date=date)
@@ -336,12 +336,13 @@ def mark_as_emergency(request, message_id):
 # =========== CRUD QUESTIONS, ISSUES AND RESPONSES ================
 @swagger_auto_schema("post", request_body=IssueSerializer())
 @api_view(["GET", "POST"])
-@authentication_classes([JWTAuthentication, TokenAuthentication])
-@permission_classes([IsAdminOrReadOnly])
+# @authentication_classes([JWTAuthentication, TokenAuthentication])
+# @permission_classes([IsAdminOrReadOnly])
 def issues(request):
     
     if request.method == "GET":
-        issue = Issue.objects.filter(is_active=True)
+        issue = sorted(Issue.objects.filter(is_active=True), key=lambda t: t.case_count, reverse=True)
+        
         serializer = IssueSerializer(issue, many=True)
         data = {"message":"success",
                 "data":serializer.data}
@@ -467,10 +468,18 @@ def escalated_cases_by_agency(request):
     local_gov = request.GET.get("local_gov")
     month = request.GET.get("month")
     year = request.GET.get("year")
+    start_date = request.GET.get("startDate")
+    end_date = request.GET.get("endDate")
 
     
     agencies = Agency.objects.filter(is_active=True)
-    messages = Message.objects.filter(is_active=True)
+        
+    if month or year or start_date or end_date:
+        messages = Message.objects.filter(is_active=True)
+    else:
+        today = timezone.now().date()
+        messages = Message.objects.filter(is_active=True, date_escalated__date = today)
+        
     
     if local_gov:
         messages = messages.filter(local_gov=local_gov)
@@ -481,11 +490,16 @@ def escalated_cases_by_agency(request):
     if year:
         messages = messages.filter(date_escalated__year=year)
         
+    if start_date:
+        messages = messages.filter(date_created__date__gte=start_date)
     
-    escalation_by_agencies = {agency.acronym: messages.filter(agencies=agency).count() for agency in agencies }
+    if end_date:
+        messages = messages.filter(date_created__date__lte=end_date)
+        
+    
+    escalation_by_agencies = {agency.acronym: messages.filter(emergency_code__agency=agency).count() for agency in agencies if messages.filter(emergency_code__agency=agency).count() > 0 }
     
     
-
     data = {
         "message":"success",
         "escalation_by_agencies": escalation_by_agencies
@@ -503,10 +517,18 @@ def reported_cases_by_issues(request):
     local_gov = request.GET.get("local_gov")
     month = request.GET.get("month")
     year = request.GET.get("year")
+    
+    start_date = request.GET.get("startDate")
+    end_date = request.GET.get("endDate")
 
     
     issues = Issue.objects.filter(is_active=True)
-    messages = Message.objects.filter(is_active=True)
+    
+    if month or year or start_date or end_date:
+        messages = Message.objects.filter(is_active=True)
+    else:
+        today = timezone.now().date()
+        messages = Message.objects.filter(is_active=True, date_created__date = today)
     
     if local_gov:
         messages = messages.filter(local_gov=local_gov)
@@ -517,20 +539,83 @@ def reported_cases_by_issues(request):
     if year:
         messages = messages.filter(date_created__year=year)
         
+    if start_date:
+        messages = messages.filter(date_created__date__gte=start_date)
     
-    report = {issue.name: len(list(filter(lambda message : message.answers.first().question.issue == issue, messages))) for issue in issues }
+    if end_date:
+        messages = messages.filter(date_created__date__lte=end_date)
+        
     
     
+    report = {}
+    messages = list(filter(lambda x: x.answers.first() is not None, messages))
+    for issue in issues:
+        
+        total = len(list(filter(lambda message : message.answers.first().question.issue == issue, messages)))
+        
+        if total > 0:
+            report[issue.name] = total
+        else:
+            continue
 
     data = {
         "message":"success",
-        "report_by_cases": report
+        "report_by_cases": report,
     }
             
     return Response(data, status=status.HTTP_200_OK)
     
     
+
+@api_view(["GET"])
+def dashboard(request):
+    """Provides analytics for cases reported today"""
+    
+    #get escalated cases by agencies
+    
+   
+    today = timezone.now().date()
+    messages = Message.objects.filter(is_active=True, date_created__date = today)
+    
+        
     
     
+   
+
+    data = {
+        "message":"success",
+        "reported_cases": messages.count(),
+        "pending" : messages.filter(status="pending").count(),
+        "escalated" : messages.filter(status="escalated").count(),
+        "completed" : messages.filter(status="completed").count(),
+        
+    }
+            
+    return Response(data, status=status.HTTP_200_OK)
+
     
     
+
+@swagger_auto_schema("post", request_body=EmergencyCodeSerializer())
+@api_view(["GET", "POST"])
+# @authentication_classes([JWTAuthentication, TokenAuthentication])
+# @permission_classes([IsAdminOrReadOnly])
+def emergency_codes(request):
+    
+    if request.method == "GET":
+        codes = EmergencyCode.objects.filter(is_active=True)
+        
+        serializer = EmergencyCodeSerializer(codes, many=True)
+        data = {"message":"success",
+                "data":serializer.data}
+        
+        return Response(data,status=status.HTTP_200_OK)
+    
+    elif request.method == "POST":
+        serializer = EmergencyCodeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            
+            return Response({"message":"success"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"error":serializer.errors,"message":"failed"}, status=status.HTTP_400_BAD_REQUEST)

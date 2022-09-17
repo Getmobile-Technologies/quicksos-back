@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 from django.contrib.auth import get_user_model
 from accounts.models import phone_regex
+from django.utils import timezone
 # Create your models here.
 
 User = get_user_model()
@@ -23,7 +24,7 @@ class Agency(models.Model):
         self.save()
         
         self.members.all().update(is_active=False) #deactivate all users associated with this escalator i.e first responders and admin
-        self.members.save()
+        # self.members.save()
         
         return
     
@@ -37,15 +38,19 @@ class Message(models.Model):
     PROVIDERS = (("whatsapp", "Whatsapp"), 
                  ("call", "Call"))
     
+    CATEGORY_CHOICES = (("emergency", "Emergency"),
+                        ("non_emergency", "Non-Emergency"),
+                        ("hoax", "Hoax"))
+    
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=300)
     phone = models.CharField(max_length=15,  validators=[phone_regex])
     status = models.CharField(max_length=300, default="pending", choices=STATUS)
     address = models.TextField(null=True,blank=True)
-    is_emergency = models.BooleanField(default=False)
+    category = models.CharField(max_length=100, blank=True, null=True, choices=CATEGORY_CHOICES)
     agent = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
-    agencies =  models.ManyToManyField(Agency, related_name="messages", blank=True)
+    emergency_code = models.ForeignKey("main.EmergencyCode", related_name="emergency_codes", blank=True, on_delete=models.CASCADE, null=True)
     local_gov = models.CharField(max_length=250, blank=True, null=True)
     agent_note = models.TextField(blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -70,7 +75,7 @@ class Message(models.Model):
     
     @property
     def agency_detail(self):
-        return self.agencies.values("acronym")
+        return self.emergency_codes.agency.values("acronym")
     
     def delete(self):
         self.is_active=False
@@ -92,6 +97,14 @@ class Issue(models.Model):
     @property
     def question_list(self):
         return self.questions.filter(is_active=True).values("id", "question", "is_image")
+    
+    @property
+    def case_count(self):
+        today = timezone.now().date()
+        messages = Message.objects.filter(is_active=True, date_created__date=today)
+        messages = list(filter(lambda x: x.answers.first() is not None, messages))
+        total = len(list(filter(lambda message : message.answers.first().question.issue.id == self.id, messages)))
+        return total
     
     
     def delete(self):
@@ -135,5 +148,19 @@ class Answer(models.Model):
     def delete(self):
         self.is_active=False
         self.save()
+        
+        
+class EmergencyCode(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    code = models.CharField(max_length=255, unique=True)
+    agency = models.ManyToManyField("main.Agency", related_name="codes")
+    date_created = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+   
+    def __str__(self):
+        return self.code
     
     
+    def delete(self):
+        self.is_active=False
+        self.save()

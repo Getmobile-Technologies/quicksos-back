@@ -9,6 +9,7 @@ class AssignedCaseSerializer(serializers.ModelSerializer):
     case_detail = serializers.ReadOnlyField()
     issue = serializers.ReadOnlyField()
     img_url = serializers.ReadOnlyField()
+    report_detail = serializers.ReadOnlyField()
     
     class Meta:
         model = AssignedCase
