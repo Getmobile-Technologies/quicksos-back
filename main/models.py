@@ -32,7 +32,8 @@ class Message(models.Model):
     STATUS = (("pending", "Pending"),
               ("escalated", "Escalated"),
               ("assigned", "Assigned"),
-              ("completed", "Completed")
+              ("completed", "Completed"),
+              ("archived", "Archived"),
               )
     
     PROVIDERS = (("whatsapp", "Whatsapp"), 
@@ -47,6 +48,7 @@ class Message(models.Model):
     name = models.CharField(max_length=300)
     phone = models.CharField(max_length=15,  validators=[phone_regex])
     status = models.CharField(max_length=300, default="pending", choices=STATUS)
+    landmark = models.CharField(max_length=300, null=True)
     address = models.TextField(null=True,blank=True)
     category = models.CharField(max_length=100, blank=True, null=True, choices=CATEGORY_CHOICES)
     agent = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
@@ -56,6 +58,8 @@ class Message(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_escalated = models.DateTimeField(null=True)
     provider = models.CharField(max_length=255, default="whatsapp", choices=PROVIDERS)
+    archive_reason = models.TextField(blank=True, null=True)
+    date_archived = models.DateTimeField(null=True)
     is_active=models.BooleanField(default=True)
     
     

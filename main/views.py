@@ -2,7 +2,7 @@ from django.forms import model_to_dict
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
-from .serializers import EmergencyCodeSerializer, EscalateSerializer, AgencySerializer, IssueSerializer, MessageSerializer
+from .serializers import ArchiveSerializer, EmergencyCodeSerializer, EscalateSerializer, AgencySerializer, IssueSerializer, MessageSerializer
 from drf_yasg.utils import swagger_auto_schema
 from .models import Agency, EmergencyCode, Issue, Message, Question, User
 from rest_framework.decorators import permission_classes, authentication_classes
@@ -237,7 +237,7 @@ def escalate(request, message_id):
                 obj.emergency_code = emergency_code
                 obj.status= "escalated"
                 obj.date_escalated = timezone.now()
-                obj.local_gov = serializer.validated_data.get('local_gov')
+                # obj.local_gov = serializer.validated_data.get('local_gov')
                 obj.agent_note = serializer.validated_data.get('agent_note')
                 
                 obj.category = serializer.validated_data.get('category')
@@ -460,6 +460,8 @@ def question_detail(request, question_id):
     
     
 @api_view(["GET"])
+@authentication_classes([JWTAuthentication, TokenAuthentication])
+@permission_classes([IsAdminOrReadOnly])
 def escalated_cases_by_agency(request):
     """Provides analytics for cases escalated to agencies. Allows parameters to filter by local_gov, month and year."""
     
@@ -509,6 +511,8 @@ def escalated_cases_by_agency(request):
 
 
 @api_view(["GET"])
+@authentication_classes([JWTAuthentication, TokenAuthentication])
+@permission_classes([IsAdminOrReadOnly])
 def reported_cases_by_issues(request):
     """Provides analytics for cases reported. Allows parameters to filter by local_gov, month and year."""
     
@@ -568,6 +572,8 @@ def reported_cases_by_issues(request):
     
 
 @api_view(["GET"])
+@authentication_classes([JWTAuthentication, TokenAuthentication])
+@permission_classes([IsAdminOrReadOnly])
 def dashboard(request):
     """Provides analytics for cases reported today"""
     
@@ -619,3 +625,49 @@ def emergency_codes(request):
             return Response({"message":"success"}, status=status.HTTP_201_CREATED)
         else:
             return Response({"error":serializer.errors,"message":"failed"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+        
+@swagger_auto_schema("post", request_body=ArchiveSerializer())
+@api_view(['POST'])
+# @authentication_classes([JWTAuthentication])
+# @permission_classes([IsAgent])
+def archive_case(request, message_id):
+    
+    """Api view to archive a case that has been reported multiple times"""
+    
+    try:
+        obj = Message.objects.get(id=message_id, is_active=True, status="pending")
+    
+        
+    except Message.DoesNotExist:
+        errors = {
+                "message":"failed",
+                "errors": f'Message with id {message_id} not found'
+                }
+        return Response(errors, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == "POST":
+        
+        serializer = ArchiveSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            
+            request.user = User.objects.first()
+            # print(request.user)
+            obj.agent = request.user
+            obj.status= "archived"
+            obj.date_archived = timezone.now()
+            obj.archive_reason = serializer.validated_data.get('archive_reason')
+            
+            obj.category = serializer.validated_data.get('category')
+            
+            obj.save()
+        
+            return Response({"message":"successful"}, status=status.HTTP_201_CREATED)
+        else:
+            errors = {
+                "message":"failed",
+                "errors":serializer.errors
+                }
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
