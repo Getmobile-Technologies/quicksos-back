@@ -249,7 +249,7 @@ class Production(Staging):
     The in-production settings.
     """
 
-    DEBUG = False
+    DEBUG = True
     
     ALLOWED_HOSTS = ['41.75.89.118', 'eko.lasercrm.com']
 
