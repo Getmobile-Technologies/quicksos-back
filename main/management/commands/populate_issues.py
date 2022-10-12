@@ -6,15 +6,9 @@ class Command(BaseCommand):
     help = 'Populates the DB with agencies, issues and questions'
 
     def handle(self, *args, **options):
-        # Agency.objects.all().delete()
         Issue.objects.all().delete()
         Question.objects.all().delete()
-        Message.objects.all().delete()
-        # agencies = [("Nigeria Police Force", "NPF"), ("Lagos State Emergency Management Agency", "LASEMA")]
-        # agency = [Agency(name=agent[0], acronym=agent[1]) for agent in agencies]
-        # Agency.objects.bulk_create(agency)
-        # with open("/main/management/commands/output.json") as file:
-        #     data = json.load(file)
+        
         
         data =  {
   "1": {
