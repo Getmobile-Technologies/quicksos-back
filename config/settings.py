@@ -202,7 +202,6 @@ class Common(Configuration):
     
     
     
-    LOGIN_URL = '/admin/login/'
 
 
 class Development(Common):
