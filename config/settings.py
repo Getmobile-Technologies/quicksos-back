@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import os
 from pathlib import Path
-
+from django.urls import reverse_lazy
 from configurations import Configuration, values
 from dotenv import load_dotenv, find_dotenv
 from django.utils.timezone import timedelta
@@ -199,6 +199,11 @@ class Common(Configuration):
         api_key = os.getenv('CLOUD_API_KEY'),
         api_secret = os.getenv('CLOUD_API_SECRET')
     )
+    
+    
+    
+    LOGIN_URL = '/admin/login/'
+
 
 class Development(Common):
     """

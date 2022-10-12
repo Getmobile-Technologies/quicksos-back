@@ -7,6 +7,7 @@ urlpatterns = [
     path("messages/all", views.get_message),
     path("messages/pending", views.pending_message),
     path("messages/<uuid:message_id>/escalate/", views.escalate),
+    path("messages/<uuid:message_id>/archive/", views.archive_case),
     path("messages/<uuid:message_id>/report/", views.message_report),
     path("messages/escalated/", views.escalated_message),
     path("messages/<uuid:message_id>/", views.message_detail),

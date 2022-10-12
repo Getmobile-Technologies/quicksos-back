@@ -107,6 +107,33 @@ class EscalateSerializer(serializers.ModelSerializer):
         else:
             return attrs
         
+
+class ArchiveSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Message
+        fields = ['archive_reason', "category"]
+        
+        
+    def validate(self, attrs):
+        err = {}
+        error = False
+        if  attrs.get('archive_reason') is None:
+            err['archive_reason'] = "Please state reason for archive"
+            error = True
+       
+            
+        if attrs.get('category') == "" or attrs.get('category')  is None:
+            err['category'] = "Please select a category for this case"
+            error = True
+        
+            
+        if error == True:
+            
+            raise ValidationError(err)
+        else:
+            return attrs
+        
         
 class EmergencyCodeSerializer(serializers.ModelSerializer):
     agency = AgencySerializer(many=True, read_only=True)
