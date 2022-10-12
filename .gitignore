@@ -93,3 +93,4 @@ Pipfile.lock
 Pipfile
 requireement.txt
 *.csv
+static

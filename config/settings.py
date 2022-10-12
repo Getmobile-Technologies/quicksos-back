@@ -139,7 +139,7 @@ class Common(Configuration):
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/3.0/howto/static-files/
     STATIC_URL = '/static/'
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
     # Default primary key field type
@@ -252,4 +252,18 @@ class Production(Staging):
     """
     The in-production settings.
     """
-    pass
+
+    DEBUG = False
+    
+    ALLOWED_HOSTS = ['41.75.89.118']
+
+    DATABASES = {  
+        'default': {  
+            'ENGINE': 'django.db.backends.mysql',  
+            'NAME': os.getenv("DB_NAME"),  
+            'USER': os.getenv("DB_USER"),  
+            'PASSWORD': os.getenv("DB_PASSWORD"),  
+            'HOST': os.getenv("DB_HOST"),  
+            'PORT': os.getenv("DB_PORT")
+        }  
+    }  
