@@ -8,7 +8,7 @@ from django.utils import timezone
 User = get_user_model()
 class Agency(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-    name = models.CharField(unique=True, max_length=255)
+    name = models.CharField(max_length=255, blank=True)
     acronym = models.CharField(unique=True, max_length=255)
     is_active= models.BooleanField(default=True)
     date_added = models.DateTimeField(auto_now_add=True)

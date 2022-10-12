@@ -604,8 +604,8 @@ def dashboard(request):
 
 @swagger_auto_schema("post", request_body=EmergencyCodeSerializer())
 @api_view(["GET", "POST"])
-# @authentication_classes([JWTAuthentication, TokenAuthentication])
-# @permission_classes([IsAdminOrReadOnly])
+@authentication_classes([JWTAuthentication, TokenAuthentication])
+@permission_classes([IsAdminOrReadOnly])
 def emergency_codes(request):
     
     if request.method == "GET":
@@ -630,8 +630,8 @@ def emergency_codes(request):
         
 @swagger_auto_schema("post", request_body=ArchiveSerializer())
 @api_view(['POST'])
-# @authentication_classes([JWTAuthentication])
-# @permission_classes([IsAgent])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAgent])
 def archive_case(request, message_id):
     
     """Api view to archive a case that has been reported multiple times"""

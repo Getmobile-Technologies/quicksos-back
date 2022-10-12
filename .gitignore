@@ -92,3 +92,4 @@ venv
 Pipfile.lock
 Pipfile
 requireement.txt
+*.csv
