@@ -2,7 +2,7 @@ from django.forms import model_to_dict
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
-from .serializers import ArchiveSerializer, EmergencyCodeSerializer, EscalateSerializer, AgencySerializer, IssueSerializer, MessageSerializer
+from .serializers import ArchiveSerializer, EmergencyCodeSerializer, EscalateSerializer, AgencySerializer, IssueSerializer, MessageSerializer, QuestionSerializer
 from drf_yasg.utils import swagger_auto_schema
 from .models import Agency, EmergencyCode, Issue, Message, Question, User
 from rest_framework.decorators import permission_classes, authentication_classes
@@ -336,8 +336,8 @@ def mark_as_emergency(request, message_id):
 # =========== CRUD QUESTIONS, ISSUES AND RESPONSES ================
 @swagger_auto_schema("post", request_body=IssueSerializer())
 @api_view(["GET", "POST"])
-# @authentication_classes([JWTAuthentication, TokenAuthentication])
-# @permission_classes([IsAdminOrReadOnly])
+@authentication_classes([JWTAuthentication, TokenAuthentication])
+@permission_classes([IsAdminOrReadOnly])
 def issues(request):
     
     if request.method == "GET":
@@ -360,7 +360,7 @@ def issues(request):
          
     
     
-    
+@swagger_auto_schema(methods=["put","delete"], request_body=IssueSerializer())
 @api_view(["GET", "PUT", "DELETE"])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAdmin])
@@ -410,7 +410,35 @@ def issue_detail(request, issue_id):
         return Response(data, status=status.HTTP_204_NO_CONTENT)
     
     
-@api_view(["DELETE"])
+@swagger_auto_schema(methods=["post"], request_body=QuestionSerializer())
+@api_view(["POST"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAdmin])
+def add_new_questions(request, issue_id):  
+    try:
+        obj = Issue.objects.get(id=issue_id, is_active=True)
+    except Issue.DoesNotExist:
+        errors = {
+                "message":"failed",
+                "errors": f'Issue with id {issue_id} not found'
+                }
+        return Response(errors, status=status.HTTP_404_NOT_FOUND)
+    
+    
+    if request.method == "POST":
+        serializer = QuestionSerializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            
+            return Response({"message":"success"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"error":serializer.errors,"message":"failed"}, status=status.HTTP_400_BAD_REQUEST)
+     
+    
+    
+    
+@swagger_auto_schema(methods=["put","delete"], request_body=IssueSerializer())
+@api_view(['PUT',"DELETE"])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAdmin])
 def question_detail(request, question_id):
@@ -423,34 +451,34 @@ def question_detail(request, question_id):
                 }
         return Response(errors, status=status.HTTP_404_NOT_FOUND)
     
-    # if request.method == 'GET':
-    #     serializer =IssueSerializer(obj)
-    #     data = {
-    #             "message":"success",
-    #             "data":serializer.data
-    #             }
+    if request.method == 'GET':
+        serializer =QuestionSerializer(obj)
+        data = {
+                "message":"success",
+                "data":serializer.data
+                }
             
-    #     return Response(data, status=status.HTTP_200_OK)
+        return Response(data, status=status.HTTP_200_OK)
         
     
-    # elif request.method == 'PUT':
-    #     serializer = IssueSerializer(obj, data=request.data, partial=True)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         data = {
-    #             "message":"success",
-    #             "data":serializer.data
-    #             }
+    elif request.method == 'PUT':
+        serializer = QuestionSerializer(obj, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                "message":"success",
+                "data":serializer.data
+                }
             
-    #         return Response(data, status=status.HTTP_202_ACCEPTED)
-    #     else:
-    #         errors = {
-    #             "message":"failed",
-    #             "errors":serializer.errors
-    #             }
-    #         return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data, status=status.HTTP_202_ACCEPTED)
+        else:
+            errors = {
+                "message":"failed",
+                "errors":serializer.errors
+                }
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
         
-    if request.method == 'DELETE':
+    elif request.method == 'DELETE':
         obj.delete()
         data = {
                 "message":"success"
@@ -552,15 +580,15 @@ def reported_cases_by_issues(request):
     
     
     report = {}
-    messages = list(filter(lambda x: x.answers.first() is not None, messages))
+    # messages = list(filter(lambda x: x.answers.first() is not None, messages))
     for issue in issues:
         
-        total = len(list(filter(lambda message : message.answers.first().question.issue == issue, messages)))
+        # total = len(list(filter(lambda message : message.answers.first().question.issue == issue, messages)))
         
+        total = messages.filter(incident=issue).count()
         if total > 0:
             report[issue.name] = total
-        else:
-            continue
+        
 
     data = {
         "message":"success",
@@ -625,7 +653,57 @@ def emergency_codes(request):
             return Response({"message":"success"}, status=status.HTTP_201_CREATED)
         else:
             return Response({"error":serializer.errors,"message":"failed"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(methods=["put","delete"], request_body=EmergencyCodeSerializer())
+@api_view(["GET", "PUT", "DELETE"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAdmin])
+def emergency_code_detail(request, code_id):
+    try:
+        obj = EmergencyCode.objects.get(id=code_id, is_active=True)
+    except EmergencyCode.DoesNotExist:
+        errors = {
+                "message":"failed",
+                "errors": f'Emergency code with id {code_id} not found'
+                }
+        return Response(errors, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        serializer =EmergencyCodeSerializer(obj)
+        data = {
+                "message":"success",
+                "data":serializer.data
+                }
+            
+        return Response(data, status=status.HTTP_200_OK)
         
+    
+    elif request.method == 'PUT':
+        serializer = EmergencyCodeSerializer(obj, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                "message":"success",
+                "data":serializer.data
+                }
+            
+            return Response(data, status=status.HTTP_202_ACCEPTED)
+        else:
+            errors = {
+                "message":"failed",
+                "errors":serializer.errors
+                }
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    elif request.method == 'DELETE':
+        obj.delete()
+        data = {
+                "message":"success"
+                }
+            
+        return Response(data, status=status.HTTP_204_NO_CONTENT)
+          
         
         
 @swagger_auto_schema("post", request_body=ArchiveSerializer())
@@ -671,3 +749,6 @@ def archive_case(request, message_id):
                 "errors":serializer.errors
                 }
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+        

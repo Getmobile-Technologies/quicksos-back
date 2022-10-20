@@ -61,6 +61,7 @@ class Message(models.Model):
     archive_reason = models.TextField(blank=True, null=True)
     date_archived = models.DateTimeField(null=True)
     is_active=models.BooleanField(default=True)
+    incident = models.ForeignKey("main.Issue", null=True, blank=True, related_name="cases", on_delete=models.CASCADE)
     
     
     class Meta:
@@ -71,11 +72,11 @@ class Message(models.Model):
     
     @property
     def response_data(self):
-        return self.answers.filter(is_active=True).values("answer",'question__question')
+        return self.answers.filter(is_active=True).values("answer",'question')
     
     @property
     def issue(self):
-        return self.answers.first().question.issue.name
+        return self.incident.name
     
     @property
     def agency_detail(self):
@@ -100,15 +101,17 @@ class Issue(models.Model):
     
     @property
     def question_list(self):
-        return self.questions.filter(is_active=True).values("id", "question", "is_image")
+        return self.questions.filter(is_active=True).values("id", "question", "is_image", "flow_num")
     
     @property
     def case_count(self):
         today = timezone.now().date()
-        messages = Message.objects.filter(is_active=True, date_created__date=today)
-        messages = list(filter(lambda x: x.answers.first() is not None, messages))
-        total = len(list(filter(lambda message : message.answers.first().question.issue.id == self.id, messages)))
-        return total
+        # messages = Message.objects.filter(is_active=True, date_created__date=today)
+        # messages = list(filter(lambda x: x.answers.first() is not None, messages))
+        # total = len(list(filter(lambda message : message.answers.first().question.issue.id == self.id, messages)))
+        
+        message_count = self.cases.filter(is_active=True, date_created__date=today).count()
+        return message_count
     
     
     def delete(self):
@@ -121,6 +124,7 @@ class Question(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     question = models.CharField(max_length=250)
     issue = models.ForeignKey("main.Issue", on_delete=models.CASCADE, related_name="questions", null=True)
+    flow_num = models.IntegerField(null=True)
     is_image = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     is_active=models.BooleanField(default=True)
@@ -138,7 +142,8 @@ class Question(models.Model):
         
 class Answer(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-    question = models.ForeignKey("main.Question", on_delete=models.CASCADE, related_name="answers")
+    # question = models.ForeignKey("main.Question", on_delete=models.CASCADE, related_name="answers")
+    question = models.CharField(max_length=255, null=True, blank=True)
     message = models.ForeignKey("main.Message", on_delete=models.CASCADE, related_name="answers")
     answer = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
@@ -164,6 +169,9 @@ class EmergencyCode(models.Model):
     def __str__(self):
         return self.code
     
+    @property
+    def agencies(self):
+        return self.agency.values()
     
     def delete(self):
         self.is_active=False

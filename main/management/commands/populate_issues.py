@@ -38,7 +38,8 @@ class Command(BaseCommand):
         "question": "Describe details of the incident"
       },
       {
-        "question": "Send us a picture or # to cancel this operation"
+        "question": "Send us a picture",
+        "is_image" : True
       },
       {
         "question": "Please, is the child in immediate danger?"
@@ -137,7 +138,7 @@ class Command(BaseCommand):
         "is_image" : True
       },
       {
-        "question": "Are there any casualities?"
+        "question": "Are there any causalities?"
       },
       {
         "question": "Is anyone trapped in the structure/building?"
@@ -155,7 +156,7 @@ class Command(BaseCommand):
         "is_image" : True
       },
       {
-        "question": "Are there any casualities?"
+        "question": "Are there any causalities?"
       },
       {
         "question": "Is anyone trapped in the structure/building/vehicle?"
@@ -173,7 +174,7 @@ class Command(BaseCommand):
         "question": "Describe details of the incident"
       },
       {
-        "question": "Are there any casualities?"
+        "question": "Are there any causalities?"
       },
       {
         "question": "Send us a picture",
@@ -192,7 +193,7 @@ class Command(BaseCommand):
         "is_image" : True
       },
       {
-        "question": "Are there any casualities?"
+        "question": "Are there any causalities?"
       },
       {
         "question": "Is it a bungalow or storey building?"
@@ -217,7 +218,7 @@ class Command(BaseCommand):
         "is_image" : True
       },
       {
-        "question": "Are there any casualities?"
+        "question": "Are there any causalities?"
       }
     ]
   },

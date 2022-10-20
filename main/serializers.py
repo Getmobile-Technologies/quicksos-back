@@ -8,6 +8,7 @@ class PostAnswerSerializer(serializers.Serializer):
     answer = serializers.CharField(max_length=5000)
     
     
+    
     def validate_question(self, value):
         try:
             value = Question.objects.get(id=value, is_active=True)
@@ -30,14 +31,29 @@ class MessageSerializer(serializers.ModelSerializer):
         responses = validated_data.pop("responses")
         emergency_code = validated_data.pop("emergency_code", None)
         message = Message.objects.create(**validated_data)
-
+        
+        ### create a question-answer object for the reported case
+        ans = []
+        incident = None
+        for response in responses: 
+            question_obj = response.pop('question')
+            question = question_obj.question 
+            incident = question_obj.issue
+             
+            answer = Answer(**response, message=message, question=question)
+            ans.append(answer) 
+        Answer.objects.bulk_create(ans)   
+        
+        ### map the reported case to an incident
+        message.incident = incident
+        
+        #escalaste the case if there an emergence code was issued
         if emergency_code:
             message.status = "escalated"
             message.date_escalated = timezone.now()
-            message.save()
             
-        ans = [Answer(**response, message=message) for response in responses]
-        Answer.objects.bulk_create(ans)   
+        message.save()
+        
         return message
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -136,7 +152,48 @@ class ArchiveSerializer(serializers.ModelSerializer):
         
         
 class EmergencyCodeSerializer(serializers.ModelSerializer):
-    agency = AgencySerializer(many=True, read_only=True)
+    agencies = serializers.ReadOnlyField()
+    
     class Meta:
         model = EmergencyCode
         fields = '__all__'
+        
+        extra_kwargs = {'agency': {'write_only': True}}
+        
+        
+    # def get_agencies(self, agencies):
+    #     package_ids = []
+    #     for package in a:
+    #         package_instance, created = Package.objects.get_or_create(pk=package.get('id'), defaults=package)
+    #         package_ids.append(package_instance.pk)
+    #     return package_ids
+
+    # def create_or_update_packages(self, packages):
+    #     package_ids = []
+    #     for package in packages:
+    #         package_instance, created = Package.objects.update_or_create(pk=package.get('id'), defaults=package)
+    #         package_ids.append(package_instance.pk)
+    #     return package_ids
+
+    def create(self, validated_data):
+        agencies = validated_data.pop('agency')
+        emergency_code = EmergencyCode.objects.create(**validated_data)
+        emergency_code.agency.set(agencies)
+        return emergency_code
+
+    def update(self, instance, validated_data):
+        
+        if "agency" in validated_data.keys():
+            
+            agencies = validated_data.pop('agency')
+            
+            instance.agency.set(agencies)
+            
+        fields = validated_data.keys()
+        for field in fields:
+            try:
+                setattr(instance, field, validated_data[field])
+            except KeyError:  # validated_data may not contain all fields during HTTP PATCH
+                pass
+        instance.save()
+        return instance
