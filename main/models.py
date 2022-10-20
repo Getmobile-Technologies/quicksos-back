@@ -101,7 +101,7 @@ class Issue(models.Model):
     
     @property
     def question_list(self):
-        return self.questions.filter(is_active=True).values("id", "question", "is_image", "flow_num")
+        return self.questions.filter(is_active=True).order_by("flow_num").values("id", "question", "is_image", "flow_num")
     
     @property
     def case_count(self):
