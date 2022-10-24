@@ -48,7 +48,7 @@ class Message(models.Model):
     name = models.CharField(max_length=300)
     phone = models.CharField(max_length=15,  validators=[phone_regex])
     status = models.CharField(max_length=300, default="pending", choices=STATUS)
-    landmark = models.CharField(max_length=300, null=True)
+    landmark = models.CharField(max_length=300, null=True, blank=True)
     address = models.TextField(null=True,blank=True)
     category = models.CharField(max_length=100, blank=True, null=True, choices=CATEGORY_CHOICES)
     agent = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)

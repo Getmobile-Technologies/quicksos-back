@@ -611,10 +611,6 @@ def dashboard(request):
     today = timezone.now().date()
     messages = Message.objects.filter(is_active=True, date_created__date = today)
     
-        
-    
-    
-   
 
     data = {
         "message":"success",
