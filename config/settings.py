@@ -26,7 +26,7 @@ class Common(Configuration):
     FIREBASE_CREDENTIALS = json.loads(os.getenv('FIREBASE_CREDENTIALS'))
     cred = credentials.Certificate(FIREBASE_CREDENTIALS)
     firebase_admin.initialize_app(cred,{
-        "databaseURL":"https://quicksos-be16b.firebaseio.com/"
+        "databaseURL":"https://quicksos-be16b-default-rtdb.firebaseio.com/"
     })
     
     # Build paths inside the project like this: BASE_DIR / 'subdir'.
