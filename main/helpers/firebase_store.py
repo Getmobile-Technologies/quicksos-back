@@ -6,11 +6,11 @@ def send_mobile_notification(user_id):
     
 
 
-    connect = firebase.FirebaseApplication(os.getenv("FIREBASE_DB_URL"))
-    result = connect.patch(f'/notifications/{user_id}', data={
-        "body": "Hurry! A new case has been assigned to you",
-        "title":"New case assigned",
-    })
+    # connect = firebase.FirebaseApplication(os.getenv("FIREBASE_DB_URL"))
+    # result = connect.patch(f'/notifications/{user_id}', data={
+    #     "body": "Hurry! A new case has been assigned to you",
+    #     "title":"New case assigned",
+    # })
     
     
 
