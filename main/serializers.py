@@ -52,6 +52,7 @@ class MessageSerializer(serializers.ModelSerializer):
         if emergency_code:
             message.status = "escalated"
             message.date_escalated = timezone.now()
+            message.emergency_code = emergency_code
             
         message.save()
         
