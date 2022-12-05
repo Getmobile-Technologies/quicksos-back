@@ -131,7 +131,7 @@ class Question(models.Model):
     
     
     def __str__(self) -> str:
-        return f"{self.question} ---> {self.issue.name}"
+        return f"{self.question} ---> {self.issue}"
     
     
     def delete(self):
