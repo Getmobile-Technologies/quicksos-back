@@ -6,7 +6,7 @@ from accounts import permissions
 from drf_yasg.views import get_schema_view # new
 from drf_yasg import openapi 
 from django.contrib.auth.decorators import login_required
-
+from rest_framework.permissions import AllowAny
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -18,7 +18,7 @@ schema_view = get_schema_view(
         license=openapi.License(name="MIT License"),
     ),
     public=True,
-    permission_classes=(permissions.IsAdmin,),
+    permission_classes=(AllowAny,),
     authentication_classes=(authentication.BasicAuthentication,)
 )
 

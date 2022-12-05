@@ -539,8 +539,8 @@ def escalated_cases_by_agency(request):
 
 
 @api_view(["GET"])
-@authentication_classes([JWTAuthentication, TokenAuthentication])
-@permission_classes([IsAdminOrReadOnly])
+# @authentication_classes([JWTAuthentication, TokenAuthentication])
+# @permission_classes([IsAdminOrReadOnly])
 def reported_cases_by_issues(request):
     """Provides analytics for cases reported. Allows parameters to filter by local_gov, month and year."""
     
@@ -560,8 +560,12 @@ def reported_cases_by_issues(request):
         messages = Message.objects.filter(is_active=True)
     else:
         today = timezone.now().date()
+
+        # messages = Message.objects.all()
+
         messages = Message.objects.filter(is_active=True, date_created__date = today)
-    
+        
+        
     if local_gov:
         messages = messages.filter(local_gov=local_gov)
         
@@ -585,7 +589,7 @@ def reported_cases_by_issues(request):
         
         # total = len(list(filter(lambda message : message.answers.first().question.issue == issue, messages)))
         
-        total = messages.filter(incident=issue).count()
+        total = messages.filter(incident=issue.id).count()
         if total > 0:
             report[issue.name] = total
         
@@ -727,7 +731,7 @@ def archive_case(request, message_id):
         
         if serializer.is_valid():
             
-            request.user = User.objects.first()
+            # request.user = User.objects.first()
             # print(request.user)
             obj.agent = request.user
             obj.status= "archived"

@@ -42,10 +42,11 @@ class MessageSerializer(serializers.ModelSerializer):
              
             answer = Answer(**response, message=message, question=question)
             ans.append(answer) 
-        Answer.objects.bulk_create(ans)   
-        
-        ### map the reported case to an incident
-        message.incident = incident
+        else:
+            Answer.objects.bulk_create(ans)   
+            
+            ### map the reported case to an incident
+            message.incident = incident
         
         #escalaste the case if there an emergence code was issued
         if emergency_code:
