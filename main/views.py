@@ -428,7 +428,7 @@ def add_new_questions(request, issue_id):
     if request.method == "POST":
         serializer = QuestionSerializer(data=request.data, many=True)
         if serializer.is_valid():
-            serializer.save()
+            Question.objects.create(**serializer.validated_data,issue=obj)
             
             return Response({"message":"success"}, status=status.HTTP_201_CREATED)
         else:
