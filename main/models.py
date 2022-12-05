@@ -136,7 +136,7 @@ class Question(models.Model):
     
     def delete(self):
         self.is_active=False
-        self.answers.update(is_active=False)
+        # self.answers.update(is_active=False)
         self.save()
         
         

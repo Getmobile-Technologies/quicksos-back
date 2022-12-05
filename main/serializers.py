@@ -196,5 +196,6 @@ class EmergencyCodeSerializer(serializers.ModelSerializer):
                 setattr(instance, field, validated_data[field])
             except KeyError:  # validated_data may not contain all fields during HTTP PATCH
                 pass
+            
         instance.save()
         return instance
