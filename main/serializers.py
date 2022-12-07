@@ -33,10 +33,6 @@ class MessageSerializer(serializers.ModelSerializer):
         
         message = Message.objects.create(**validated_data)
         
-        if "issues" in validated_data.keys():
-            incident = validated_data.pop("issues")
-            message.incident = incident
-            message.save()
             
         ### create a question-answer object for the reported case
         ans = []
