@@ -53,10 +53,10 @@ def add_admin(request):
 
             if "lga" in serializer.validated_data.keys():
                 local_gov = serializer.validated_data.pop("lga")
+                serializer.validated_data['local_gov'] = local_gov
                 
             serializer.validated_data['password'] = generate_password() 
             serializer.validated_data['is_active']=True
-            serializer.validated_data['local_gov'] = local_gov
             serializer.save()
             
             data = {
