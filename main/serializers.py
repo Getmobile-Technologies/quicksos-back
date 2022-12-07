@@ -30,23 +30,25 @@ class MessageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         responses = validated_data.pop("responses")
         emergency_code = validated_data.pop("emergency_code", None)
+        
         message = Message.objects.create(**validated_data)
         
+        if "issues" in validated_data.keys():
+            incident = validated_data.pop("issues")
+            message.incident = incident
+            
         ### create a question-answer object for the reported case
         ans = []
-        incident = None
         for response in responses: 
             question_obj = response.pop('question')
             question = question_obj.question 
-            incident = question_obj.issue
              
             answer = Answer(**response, message=message, question=question)
             ans.append(answer) 
         else:
             Answer.objects.bulk_create(ans)   
             
-            ### map the reported case to an incident
-            message.incident = incident
+        
         
         #escalaste the case if there an emergence code was issued
         if emergency_code:
