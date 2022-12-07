@@ -21,6 +21,10 @@ from .helpers.check_agency import validate_responders
 def add_message(request):
     
     if request.method == "POST":
+        
+        if "issues" in request.data.keys():
+            request.data["incident"] = request.data.pop("issues")
+            
         serializer = MessageSerializer(data=request.data)
 
         if serializer.is_valid():
