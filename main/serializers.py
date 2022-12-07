@@ -31,7 +31,7 @@ class MessageSerializer(serializers.ModelSerializer):
         responses = validated_data.pop("responses")
         emergency_code = validated_data.pop("emergency_code", None)
         
-        message = Message.objects.create(**validated_data, incident=incident)
+        message = Message.objects.create(**validated_data)
         
         if "issues" in validated_data.keys():
             incident = validated_data.pop("issues")
