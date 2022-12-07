@@ -36,6 +36,7 @@ class MessageSerializer(serializers.ModelSerializer):
         if "issues" in validated_data.keys():
             incident = validated_data.pop("issues")
             message.incident = incident
+            message.save()
             
         ### create a question-answer object for the reported case
         ans = []
@@ -56,7 +57,7 @@ class MessageSerializer(serializers.ModelSerializer):
             message.date_escalated = timezone.now()
             message.emergency_code = emergency_code
             
-        message.save()
+            message.save()
         
         return message
 
