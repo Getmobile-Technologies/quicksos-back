@@ -12,6 +12,7 @@ urlpatterns = [
     path("users/auth/", views.user_login),
     path('users/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path("users/reset_password/", views.reset_password),
+    path("users/admin-reset-user-password/", views.reset_user_password),
     path("users/change_firebase_key", views.change_firebase_key),
     path('users/forget_password/', include('django_rest_passwordreset.urls', namespace='forget_password')),
 ]

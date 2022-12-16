@@ -543,8 +543,8 @@ def escalated_cases_by_agency(request):
 
 
 @api_view(["GET"])
-# @authentication_classes([JWTAuthentication, TokenAuthentication])
-# @permission_classes([IsAdminOrReadOnly])
+@authentication_classes([JWTAuthentication, TokenAuthentication])
+@permission_classes([IsAdminOrReadOnly])
 def reported_cases_by_issues(request):
     """Provides analytics for cases reported. Allows parameters to filter by local_gov, month and year."""
     

@@ -34,40 +34,40 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
     )
     
     
-@receiver(post_save, sender=User)
-def send_details(sender, instance, created, **kwargs):
-    if created and instance.is_superuser==False:
-        # print(instance.password)
-        role = " ".join(str(instance.role).split('_'))
-        subject = f"YOUR {role} ACCOUNT FOR QUICKSOS".upper()
+# @receiver(post_save, sender=User)
+# def send_details(sender, instance, created, **kwargs):
+#     if created and instance.is_superuser==False:
+#         # print(instance.password)
+#         role = " ".join(str(instance.role).split('_'))
+#         subject = f"YOUR {role} ACCOUNT FOR QUICKSOS".upper()
         
-        if role.startswith(("a", "e", "i", "o", "u")):
-            article = "an"
-        else:
-            article = "a"
+#         if role.startswith(("a", "e", "i", "o", "u")):
+#             article = "an"
+#         else:
+#             article = "a"
         
-        message = f"""Hi, {str(instance.first_name).title()}.
-You have just been on boarded on the quicksos platform as {article} {role.lower()}. Your login details are below:
-E-mail: {instance.email} 
-password: {instance.password}    
+#         message = f"""Hi, {str(instance.first_name).title()}.
+# You have just been on boarded on the quicksos platform as {article} {role.lower()}. Your login details are below:
+# E-mail: {instance.email} 
+# password: {instance.password}    
 
-Cheers,
-QuickSOS Team.       
-"""   
-        # msg_html = render_to_string('signup_email.html', {
-        #                 'first_name': str(instance.first_name).title(),
-        #                 'code':code,
-        #                 'url':url})
-        instance.set_password(instance.password)
-        instance.save()
+# Cheers,
+# QuickSOS Team.       
+# """   
+#         # msg_html = render_to_string('signup_email.html', {
+#         #                 'first_name': str(instance.first_name).title(),
+#         #                 'code':code,
+#         #                 'url':url})
+#         instance.set_password(instance.password)
+#         instance.save()
         
-        email_from = settings.Common.DEFAULT_FROM_EMAIL
-        recipient_list = [instance.email]
-        send_mail(subject, message, email_from, recipient_list)
+#         email_from = settings.Common.DEFAULT_FROM_EMAIL
+#         recipient_list = [instance.email]
+#         send_mail(subject, message, email_from, recipient_list)
         
         
-        # print(instance.password)
-        return
+#         # print(instance.password)
+#         return
     
     
     

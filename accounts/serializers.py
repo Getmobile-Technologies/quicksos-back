@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
         
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+    username = serializers.CharField()
     password = serializers.CharField(max_length=300)
     firebase_key = serializers.CharField(max_length=1000, allow_blank=True, required=False)
     
@@ -35,5 +35,7 @@ class ChangeFirebaseKey(serializers.Serializer):
     firebase_key = serializers.CharField(max_length=1000, allow_blank=True)
     
 
-    
+
+class AdminResetUserPassword(serializers.Serializer):
+    username = serializers.CharField()
 # class AddFirstResponder

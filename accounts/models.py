@@ -29,9 +29,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     first_name    = models.CharField(_('first name'),max_length = 250)
     last_name     = models.CharField(_('last name'),max_length = 250)
-    email         = models.EmailField(_('email'), unique=True)
+    username      = models.CharField(_('username'),max_length=255, unique=True, null=True)
+    email         = models.EmailField(_('email'), blank=True, null = True)
     gender        = models.CharField(_('gender'),max_length = 250, null=True)
-    phone         = models.CharField(_('phone'), max_length = 20, unique = True, validators=[phone_regex])
+    phone         = models.CharField(_('phone'), max_length = 20, validators=[phone_regex])
     address       = models.CharField(_('address'), max_length = 250, null = True)
     local_gov       = models.CharField(_('local government'), max_length = 250, null = True)
     image_url       = models.URLField(null=True, blank=True)
@@ -51,7 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'username'
     
 
     class Meta:
@@ -60,7 +61,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         agency = f'-- {self.agency.acronym}' if self.agency else ""
-        return f'{self.email} -- {self.role}' + agency
+        return f'{self.username} -- {self.role}' + agency
     
     @property
     def agency_detail(self):

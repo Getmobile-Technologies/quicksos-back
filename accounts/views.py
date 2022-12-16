@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status
 from accounts.permissions import IsAdmin
-from .serializers import ChangeFirebaseKey, ChangePasswordSerializer, LoginSerializer, UserSerializer
+from .serializers import AdminResetUserPassword, ChangeFirebaseKey, ChangePasswordSerializer, LoginSerializer, UserSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, get_user_model
@@ -15,8 +15,11 @@ from .helpers.generators import generate_password
 from django.contrib.auth.hashers import make_password
 import cloudinary
 import cloudinary.uploader
+from django.db.utils import IntegrityError
 
+import os
 
+PASSWORD = os.getenv("DEFAULT_PASSWORD")
 
 User = get_user_model()
 
@@ -55,9 +58,17 @@ def add_admin(request):
                 local_gov = serializer.validated_data.pop("lga")
                 serializer.validated_data['local_gov'] = local_gov
                 
-            serializer.validated_data['password'] = generate_password() 
+             
+            serializer.validated_data['username'] = (serializer.validated_data.get("first_name") + "." + serializer.validated_data.get("last_name")).lower()
             serializer.validated_data['is_active']=True
-            serializer.save()
+            
+            try: 
+                user = serializer.save()
+                user.set_password(PASSWORD)
+                user.save()
+            except IntegrityError:
+                raise ValidationError({"message": "Generated username has been taken by a different user. Please try other names."})
+            
             
             data = {
                 'message' : "Success",
@@ -316,7 +327,7 @@ def user_login(request):
         if serializer.is_valid():
             data = serializer.validated_data
             provider = 'email'
-            user = authenticate(request, email = data['email'], password = data['password'])
+            user = authenticate(request, username = data['username'], password = data['password'])
             if user is not None:
                 if user.is_active==True:
                     if user.auth_provider == provider:
@@ -329,6 +340,7 @@ def user_login(request):
                             user_detail['id']   = user.id
                             user_detail['first_name'] = user.first_name
                             user_detail['last_name'] = user.last_name
+                            user_detail['username'] = user.username
                             user_detail['email'] = user.email
                             user_detail['phone'] = user.phone
                             user_detail['role'] = user.role
@@ -368,7 +380,7 @@ def user_login(request):
             else:
                 data = {
                     
-                    'error': 'Please provide a valid email and a password'
+                    'error': 'Please provide a valid username and password'
                     }
                 return Response(data, status=status.HTTP_401_UNAUTHORIZED)
         else:
@@ -436,8 +448,35 @@ def change_firebase_key(request):
     
     user = request.user
     serializer = ChangeFirebaseKey(data=request.data)
-    serializer.is_Valid()
+    serializer.is_Valid(raise_exception=True)
     user.firebase_key = serializer.validated_data.get("firebase_key")
     user.save()
     
     return Response({}, status=status.HTTP_204_NO_CONTENT)   
+
+
+@swagger_auto_schema(methods=['POST'], request_body=AdminResetUserPassword())
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAdminUser])
+def reset_user_password(request):
+    
+    """Allows the admin to reset password of a user to default  """
+    
+    if request.method == 'POST':
+        
+        serializer = AdminResetUserPassword(data = request.data)
+        if serializer.is_valid():
+            try:
+                user = User.objects.get(username=serializer.validated_data.get("username"), is_active=True)
+                
+                user.set_password(PASSWORD)
+                user.save()
+                
+    
+            except User.DoesNotExist:
+                raise ValidationError({"message":"User with this username does not exist"})
+            
+       
+
+        return Response({"message":"success"}, status=status.HTTP_200_OK)
