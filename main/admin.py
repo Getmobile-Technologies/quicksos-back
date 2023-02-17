@@ -3,7 +3,7 @@ from .models import EmergencyCode, Message, Agency, Issue, Question, Answer
 # Register your models here.
 
 
-admin.site.register([Message, Agency, Issue, Answer, EmergencyCode])
+admin.site.register([ Agency, Issue,EmergencyCode])
 
 
 @admin.register(Question)
