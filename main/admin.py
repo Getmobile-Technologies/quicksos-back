@@ -9,3 +9,14 @@ admin.site.register([Message, Agency, Issue, Answer, EmergencyCode])
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     list_filter = ['issue']
+    
+    
+    
+class AnswerInline(admin.TabularInline):
+    model = Answer
+
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    model = Message
+    inlines = [AnswerInline]
