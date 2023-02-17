@@ -54,9 +54,9 @@ def add_admin(request):
                         "message":"You must add an agency for this account."
                     }) 
 
-            if "lga" in serializer.validated_data.keys():
-                local_gov = serializer.validated_data.pop("lga")
-                serializer.validated_data['local_gov'] = local_gov
+            # if "lga" in serializer.validated_data.keys():
+            #     local_gov = serializer.validated_data.pop("lga")
+            #     serializer.validated_data['local_gov'] = local_gov
                 
              
             serializer.validated_data['username'] = (serializer.validated_data.get("first_name") + "." + serializer.validated_data.get("last_name")).lower()

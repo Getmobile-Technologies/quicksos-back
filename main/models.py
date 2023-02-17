@@ -56,10 +56,10 @@ class Message(models.Model):
     local_gov = models.CharField(max_length=250, blank=True, null=True)
     agent_note = models.TextField(blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
-    date_escalated = models.DateTimeField(null=True)
+    date_escalated = models.DateTimeField(null=True, blank=True)
     provider = models.CharField(max_length=255, default="whatsapp", choices=PROVIDERS)
     archive_reason = models.TextField(blank=True, null=True)
-    date_archived = models.DateTimeField(null=True)
+    date_archived = models.DateTimeField(null=True, blank=True)
     is_active=models.BooleanField(default=True)
     incident = models.ForeignKey("main.Issue", null=True, blank=True, related_name="cases", on_delete=models.CASCADE)
     
