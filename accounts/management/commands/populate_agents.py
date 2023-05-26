@@ -21,8 +21,14 @@ class Command(BaseCommand):
                 if len(name)==3:
                     first_name,middle_name,last_name = name
                     clean_data["first_name"] = first_name
-                    clean_data['last_name'] = f'{middle_name} {last_name}'
-                    clean_data['username'] = f'{first_name.lower()}.{middle_name.lower()}.{last_name.lower()}'
+                    if middle_name != "":
+                        
+                        clean_data['last_name'] = f'{middle_name} {last_name}'
+                    
+                        clean_data['username'] = f'{first_name.lower()}.{middle_name.lower()}.{last_name.lower()}'
+                    else:
+                        clean_data['last_name'] = last_name
+                        clean_data['username'] = f'{first_name.lower()}.{last_name.lower()}'
                     
                 else:
                     first_name,last_name = name
