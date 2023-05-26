@@ -31,7 +31,7 @@ class Command(BaseCommand):
                     
                 
                 
-                clean_data['phone']= "+234" + row["phone"]
+                clean_data['phone']= "0" + row["phone"]
                 clean_data['email'] = row['email']
                 clean_data['password'] = os.getenv('DEFAULT_PASSWORD')
                 # print(clean_data)
