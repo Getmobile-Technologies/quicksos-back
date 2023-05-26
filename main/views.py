@@ -531,7 +531,7 @@ def escalated_cases_by_agency(request):
         messages = messages.filter(date_created__date__lte=end_date)
         
     
-    escalation_by_agencies = {agency.acronym: messages.filter(emergency_code__agency=agency).count() for agency in agencies if messages.filter(emergency_code__agency=agency).count() > 0 }
+    escalation_by_agencies = {agency.acronym: messages.filter(emergency_code__agency=agency).count() for agency in agencies }
     
     
     data = {
@@ -594,8 +594,8 @@ def reported_cases_by_issues(request):
         # total = len(list(filter(lambda message : message.answers.first().question.issue == issue, messages)))
         
         total = messages.filter(incident=issue.id).count()
-        if total > 0:
-            report[issue.name] = total
+        
+        report[issue.name] = total
         
 
     data = {
