@@ -15,7 +15,8 @@ class Command(BaseCommand):
             dict_data = []
             for row in csv_file:
                 clean_data = {}
-                name = row['\ufeffname'].title().split()
+                # name = row['\ufeffname'].title().split()
+                name = row['name'].title().split()
                 
                 if len(name)==3:
                     first_name,middle_name,last_name = name
