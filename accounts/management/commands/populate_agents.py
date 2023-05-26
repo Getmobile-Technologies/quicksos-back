@@ -34,7 +34,7 @@ class Command(BaseCommand):
                 
                 clean_data['phone']= "0" + row["phone"]
                 clean_data['email'] = row['email']
-                clean_data['password'] = os.getenv('DEFAULT_PASSWORD')
+                clean_data['password'] = 'Password1'
                 # print(clean_data)
                 dict_data.append(clean_data)
                 users.append(User(**clean_data, role='agent', is_active=True))
