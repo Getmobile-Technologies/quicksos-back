@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from django.utils import timezone
 
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin
@@ -69,4 +70,5 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def delete(self):
         self.is_active = False
+        self.username = self.username + f"--deleted--{timezone.now()}"
         self.save()
