@@ -70,5 +70,5 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def delete(self):
         self.is_active = False
-        self.username = self.username + f"--deleted--{timezone.now()}"
+        self.username = f"{self.username}--deleted--{timezone.now()}"
         self.save()

@@ -94,7 +94,7 @@ def get_user(request):
     
     """Allows the admin to see all users  """
     if request.method == 'GET':
-        users = User.objects.filter(is_active=True)
+        users = User.objects.filter(is_active=True).order_by('-date_joined')
     
         
         serializer = UserSerializer(users, many =True)
@@ -115,7 +115,7 @@ def get_agents(request):
     
     """Allows the admin to see all agents  """
     if request.method == 'GET':
-        users = User.objects.filter(is_active=True, role="agent")
+        users = User.objects.filter(is_active=True, role="agent").order_by('-date_joined')
     
         
         serializer = UserSerializer(users, many =True)
@@ -134,7 +134,7 @@ def get_escalators(request):
     
     """Allows the admin to see all escalators  """
     if request.method == 'GET':
-        users = User.objects.filter(is_active=True, role="escalator")
+        users = User.objects.filter(is_active=True, role="escalator").order_by('-date_joined')
     
         
         serializer = UserSerializer(users, many =True)
@@ -153,9 +153,9 @@ def get_responders(request):
     """Allows the admin to see all escalators  """
     if request.method == 'GET':
         if request.user.role=="escalator":
-           users = User.objects.filter(is_active=True, role="first_responder", agency=request.user.agency) 
+           users = User.objects.filter(is_active=True, role="first_responder", agency=request.user.agency).order_by('-date_joined') 
         elif request.user.role=="admin":
-            users = User.objects.filter(is_active=True, role="first_responder")
+            users = User.objects.filter(is_active=True, role="first_responder").order_by('-date_joined')
         else:
             raise PermissionDenied({"message":"You do not have the permission to view this."})
     
@@ -305,8 +305,7 @@ def get_user_detail(request, user_id):
 
     #delete the account
     elif request.method == 'DELETE':
-        user.is_active = False
-        user.save()
+        user.delete()
 
         data = {
                 'message' : "Deleted Successfully"
