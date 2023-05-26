@@ -508,12 +508,13 @@ def escalated_cases_by_agency(request):
     
     agencies = Agency.objects.filter(is_active=True)
         
-    if month or year or start_date or end_date:
-        messages = Message.objects.filter(is_active=True)
-    else:
-        today = timezone.now().date()
-        messages = Message.objects.filter(is_active=True, date_escalated__date = today)
+    # if month or year or start_date or end_date:
+    #     messages = Message.objects.filter(is_active=True)
+    # else:
+    #     today = timezone.now().date()
+    #     messages = Message.objects.filter(is_active=True, date_escalated__date = today)
         
+    messages = Message.objects.filter(is_active=True)
     
     if local_gov:
         messages = messages.filter(local_gov=local_gov)
@@ -560,15 +561,16 @@ def reported_cases_by_issues(request):
     
     issues = Issue.objects.filter(is_active=True)
     
-    if month or year or start_date or end_date:
-        messages = Message.objects.filter(is_active=True)
-    else:
-        today = timezone.now().date()
+    # if month or year or start_date or end_date:
+    #     messages = Message.objects.filter(is_active=True)
+    # else:
+    #     today = timezone.now().date()
 
-        # messages = Message.objects.all()
+    #     # messages = Message.objects.all()
 
-        messages = Message.objects.filter(is_active=True, date_created__date = today)
-        
+    #     messages = Message.objects.filter(is_active=True, date_created__date = today)
+    
+    messages = Message.objects.filter(is_active=True)  
         
     if local_gov:
         messages = messages.filter(local_gov=local_gov)
@@ -617,7 +619,8 @@ def dashboard(request):
     
    
     today = timezone.now().date()
-    messages = Message.objects.filter(is_active=True, date_created__date = today)
+    # messages = Message.objects.filter(is_active=True, date_created__date = today)
+    messages = Message.objects.filter(is_active=True)
     
 
     data = {
