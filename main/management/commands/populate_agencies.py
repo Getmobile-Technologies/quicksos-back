@@ -32,15 +32,15 @@ class Command(BaseCommand):
         
         
         
-        with open('main/management/commands/codes.csv', "r") as file:
+        with open('codes.csv', "r") as file:
             csv_file = csv.DictReader(file)
             Codes = []
             for row in csv_file:
                 print(row, "\n")
                 
                 responders = list(map(lambda x: Agency.objects.get(acronym=x.strip().rstrip()).id, row['responders'].split(",")))
-                # code = row['\ufeffcode'] + " - " + row['incident']
-                code = row['code'] + " - " + row['incident']
+                code = row['\ufeffcode'] + " - " + row['incident']
+                # code = row['code'] + " - " + row['incident']
                 
                 
                 
