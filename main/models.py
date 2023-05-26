@@ -80,7 +80,7 @@ class Message(models.Model):
     
     @property
     def agency_detail(self):
-        return self.emergency_codes.agency.values("acronym")
+        return self.emergency_code.agency.values("acronym")
     
     def delete(self):
         self.is_active=False
