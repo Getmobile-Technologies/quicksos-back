@@ -21,8 +21,14 @@ class Command(BaseCommand):
                 if len(name)==3:
                     first_name,middle_name,last_name = name
                     clean_data["first_name"] = first_name
-                    clean_data['last_name'] = f'{middle_name} {last_name}'
-                    clean_data['username'] = f'{first_name.lower()}.{middle_name.lower()}.{last_name.lower()}'
+                    if middle_name != "":
+                        
+                        clean_data['last_name'] = f'{middle_name} {last_name}'
+                    
+                        clean_data['username'] = f'{first_name.lower()}.{middle_name.lower()}.{last_name.lower()}'
+                    else:
+                        clean_data['last_name'] = last_name
+                        clean_data['username'] = f'{first_name.lower()}.{last_name.lower()}'
                     
                 else:
                     first_name,last_name = name
@@ -34,7 +40,7 @@ class Command(BaseCommand):
                 
                 clean_data['phone']= "0" + row["phone"]
                 clean_data['email'] = row['email']
-                clean_data['password'] = os.getenv('DEFAULT_PASSWORD')
+                clean_data['password'] = 'Password1'
                 # print(clean_data)
                 dict_data.append(clean_data)
                 users.append(User(**clean_data, role='agent', is_active=True))
