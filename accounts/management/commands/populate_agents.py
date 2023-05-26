@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = 'Populates the DB with agencies, issues and questions'
 
     def handle(self, *args, **options):
-        User.objects.all().delete()
+        # User.objects.all().delete()
         
         with open('user_data.csv', "r") as file:
             csv_file = csv.DictReader(file)
