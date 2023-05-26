@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = 'Populates the DB with agencies, issues and questions'
 
     def handle(self, *args, **options):
-        User.objects.all().delete()
+        # User.objects.all().delete()
         
         with open('user_data.csv', "r") as file:
             csv_file = csv.DictReader(file)
@@ -15,7 +15,8 @@ class Command(BaseCommand):
             dict_data = []
             for row in csv_file:
                 clean_data = {}
-                name = row['\ufeffname'].title().split()
+                # name = row['\ufeffname'].title().split()
+                name = row['name'].title().split()
                 
                 if len(name)==3:
                     first_name,middle_name,last_name = name
