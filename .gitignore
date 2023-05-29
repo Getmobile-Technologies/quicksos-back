@@ -94,3 +94,4 @@ Pipfile
 requireement.txt
 *.csv
 static
+logs/
