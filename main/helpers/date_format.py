@@ -24,18 +24,20 @@ def get_month(target_month, target_year):
     
     """Returns start and end of a specific month in a year"""
     
+    target_tz = timezone.get_current_timezone()
+    
     # Set the start date to the beginning of the target month
     start_date = datetime(target_year, target_month, 1).date()
 
     # Calculate the end date as the beginning of the next month, then subtract one day to get the last day of the target month
     end_date = (datetime(target_year, target_month + 1, 1) - timedelta(days=1)).date()
 
-    # Set the start of the day for the start date
-    start_of_mth = datetime.combine(start_date, time.min)
-
-    # Set the end of the day for the end date
-    end_of_mth = datetime.combine(end_date, time.max)
+    target_date = timezone.datetime(start_date.year, start_date.month, start_date.day, tzinfo=target_tz)
+    start_of_mth = datetime.combine(target_date, time.min).astimezone(target_tz)
+    
+    target_date = timezone.datetime(end_date.year, end_date.month, end_date.day, tzinfo=target_tz)
+    end_of_mth = datetime.combine(target_date, time.max).astimezone(target_tz)
 
   
-    
+    print(start_of_mth, end_of_mth)
     return start_of_mth, end_of_mth
