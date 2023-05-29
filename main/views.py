@@ -788,7 +788,7 @@ def archive_case(request, message_id):
         
         
         
-@swagger_auto_schema(methods=['get', 'post'], request_body=MonthlyReportSerializer())
+@swagger_auto_schema(method="post", request_body=MonthlyReportSerializer())
 @api_view(["GET", "POST"])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAdmin])

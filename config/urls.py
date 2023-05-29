@@ -6,7 +6,7 @@ from accounts import permissions
 from drf_yasg.views import get_schema_view # new
 from drf_yasg import openapi 
 from django.contrib.auth.decorators import login_required
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, AllowAny
 
 schema_view = get_schema_view(
     openapi.Info(
