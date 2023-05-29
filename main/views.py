@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 
-from main.helpers.date_format import get_start_end_of_day
+from main.helpers.date_format import get_month, get_start_end_of_day
 from .serializers import ArchiveSerializer, EmergencyCodeSerializer, EscalateSerializer, AgencySerializer, IssueSerializer, MessageSerializer, QuestionSerializer
 from drf_yasg.utils import swagger_auto_schema
 from .models import Agency, EmergencyCode, Issue, Message, Question, User
@@ -528,10 +528,16 @@ def escalated_cases_by_agency(request):
         messages = messages.filter(local_gov=local_gov)
         
     if month:
-        messages = messages.filter(date_created__month=month)
+        start_date, end_date = get_month(month, today.year)
+        
+        messages = messages.filter(date_created__date__range=(start_date, end_date))
     
     if year:
         messages = messages.filter(date_created__year=year)
+        
+    if month and year:
+        start_date, end_date = get_month(month, today.year)
+        messages = messages.filter(date_created__date__range=(start_date, end_date))
         
     if start_date:
         start_of_day, end_of_day = get_start_end_of_day(start_date_str=start_date, end_date_str=today_str)
@@ -586,10 +592,16 @@ def reported_cases_by_issues(request):
         messages = messages.filter(local_gov=local_gov)
         
     if month:
-        messages = messages.filter(date_created__month=month)
+        start_date, end_date = get_month(month, today.year)
+        
+        messages = messages.filter(date_created__date__range=(start_date, end_date))
     
     if year:
         messages = messages.filter(date_created__year=year)
+        
+    if month and year:
+        start_date, end_date = get_month(month, today.year)
+        messages = messages.filter(date_created__date__range=(start_date, end_date))
         
     if start_date:
         start_of_day, end_of_day = get_start_end_of_day(start_date_str=start_date, end_date_str=today_str)
