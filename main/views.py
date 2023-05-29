@@ -800,7 +800,7 @@ def monthly_report(request):
         month_start, month_end = get_month(today.month, today.year)
         
     if request.method == "POST":
-        serializer = MonthlyReportSerializer(request.data)
+        serializer = MonthlyReportSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         month_start, month_end = get_month(serializer.validated_data.get("month"),
                                            serializer.validated_data.get("year"))
