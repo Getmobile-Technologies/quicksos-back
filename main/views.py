@@ -2,6 +2,8 @@ from django.forms import model_to_dict
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
+
+from main.helpers.date_format import get_start_end_of_day
 from .serializers import ArchiveSerializer, EmergencyCodeSerializer, EscalateSerializer, AgencySerializer, IssueSerializer, MessageSerializer, QuestionSerializer
 from drf_yasg.utils import swagger_auto_schema
 from .models import Agency, EmergencyCode, Issue, Message, Question, User
@@ -619,8 +621,12 @@ def dashboard(request):
     
    
     today = timezone.now().date()
-    # messages = Message.objects.filter(is_active=True, date_created__date = today)
-    messages = Message.objects.filter(is_active=True)
+    today_str = today.strftime("%Y-%m-%d")
+    
+    start_of_day, end_of_day = get_start_end_of_day(start_date_str=today_str, end_date_str=today_str)
+    
+    messages = Message.objects.filter(is_active=True,date_created__range=(start_of_day, end_of_day))
+    # messages = Message.objects.filter(is_active=True)
     
 
     data = {
