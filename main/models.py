@@ -3,6 +3,8 @@ import uuid
 from django.contrib.auth import get_user_model
 from accounts.models import phone_regex
 from django.utils import timezone
+
+from main.helpers.date_format import get_start_end_of_day
 # Create your models here.
 
 User = get_user_model()
@@ -105,12 +107,21 @@ class Issue(models.Model):
     
     @property
     def case_count(self):
-        today = timezone.now().date()
+        # today = timezone.now().date()
         # messages = Message.objects.filter(is_active=True, date_created__date=today)
         # messages = list(filter(lambda x: x.answers.first() is not None, messages))
         # total = len(list(filter(lambda message : message.answers.first().question.issue.id == self.id, messages)))
         
-        message_count = self.cases.filter(is_active=True, date_created__date=today).count()
+       
+        today = timezone.now().date()
+        today_str = today.strftime("%Y-%m-%d")
+        
+        start_of_day, end_of_day = get_start_end_of_day(start_date_str=today_str, 
+                                                        end_date_str=today_str)
+        
+        message_count = self.cases.filter(is_active=True,
+                                        date_created__range=(start_of_day, end_of_day))\
+                                        .count()
         return message_count
     
     
