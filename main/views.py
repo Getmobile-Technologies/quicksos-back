@@ -825,9 +825,10 @@ def monthly_report(request):
     
     lga_set = set(Message.objects.filter(is_active=True).values_list("local_gov", flat=True))
     
-    lga_cases = sorted({lga:messages.filter(local_gov=lga).count() for lga in lga_set})
+    lga_cases = {lga:messages.filter(local_gov=lga).count() for lga in lga_set}
+
     
-    data["cases_by_lga"] = lga_cases
+    data["cases_by_lga"] = dict(sorted(lga_cases.items())) 
     
     
     issues = Issue.objects.filter(is_active=True)
