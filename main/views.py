@@ -788,7 +788,10 @@ def archive_case(request, message_id):
         
         
         
+@swagger_auto_schema(methods=['get', 'post'], request_body=MonthlyReportSerializer())
 @api_view(["GET", "POST"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAdmin])
 def monthly_report(request):
     
     if request.method == "GET":
