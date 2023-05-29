@@ -801,7 +801,7 @@ def monthly_report(request):
         
     if request.method == "POST":
         serializer = MonthlyReportSerializer(request.data)
-        
+        serializer.is_valid(raise_exception=True)
         month_start, month_end = get_month(serializer.validated_data.get("month"),
                                            serializer.validated_data.get("year"))
     data = {}
