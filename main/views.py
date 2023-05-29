@@ -502,8 +502,8 @@ def escalated_cases_by_agency(request):
     #get escalated cases by agencies    
     
     local_gov = request.GET.get("local_gov")
-    month = request.GET.get("month")
-    year = request.GET.get("year")
+    month = int(request.GET.get("month"))
+    year = int(request.GET.get("year"))
     start_date = request.GET.get("startDate")
     end_date = request.GET.get("endDate")
 
@@ -569,8 +569,8 @@ def reported_cases_by_issues(request):
     #get escalated cases by agencies
     
     local_gov = request.GET.get("local_gov")
-    month = request.GET.get("month")
-    year = request.GET.get("year")
+    month = int(request.GET.get("month"))
+    year = int(request.GET.get("year"))
     
     start_date = request.GET.get("startDate")
     end_date = request.GET.get("endDate")
