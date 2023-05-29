@@ -502,8 +502,8 @@ def escalated_cases_by_agency(request):
     #get escalated cases by agencies    
     
     local_gov = request.GET.get("local_gov")
-    month = int(request.GET.get("month"))
-    year = int(request.GET.get("year"))
+    month = request.GET.get("month")
+    year = request.GET.get("year")
     start_date = request.GET.get("startDate")
     end_date = request.GET.get("endDate")
 
@@ -528,7 +528,7 @@ def escalated_cases_by_agency(request):
         messages = messages.filter(local_gov=local_gov)
         
     if month:
-        start_date, end_date = get_month(month, today.year)
+        start_date, end_date = get_month(int(month), today.year)
         
         messages = messages.filter(date_created__date__range=(start_date, end_date))
     
@@ -536,7 +536,7 @@ def escalated_cases_by_agency(request):
         messages = messages.filter(date_created__year=year)
         
     if month and year:
-        start_date, end_date = get_month(month, today.year)
+        start_date, end_date = get_month(int(month), int(year))
         messages = messages.filter(date_created__date__range=(start_date, end_date))
         
     if start_date:
@@ -569,8 +569,8 @@ def reported_cases_by_issues(request):
     #get escalated cases by agencies
     
     local_gov = request.GET.get("local_gov")
-    month = int(request.GET.get("month"))
-    year = int(request.GET.get("year"))
+    month = (request.GET.get("month"))
+    year = request.GET.get("year")
     
     start_date = request.GET.get("startDate")
     end_date = request.GET.get("endDate")
@@ -592,7 +592,7 @@ def reported_cases_by_issues(request):
         messages = messages.filter(local_gov=local_gov)
         
     if month:
-        start_date, end_date = get_month(month, today.year)
+        start_date, end_date = get_month(int(month), today.year)
         
         messages = messages.filter(date_created__date__range=(start_date, end_date))
     
@@ -600,7 +600,7 @@ def reported_cases_by_issues(request):
         messages = messages.filter(date_created__year=year)
         
     if month and year:
-        start_date, end_date = get_month(month, today.year)
+        start_date, end_date = get_month(int(month), int(year))
         messages = messages.filter(date_created__date__range=(start_date, end_date))
         
     if start_date:
