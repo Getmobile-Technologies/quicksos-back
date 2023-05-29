@@ -529,15 +529,14 @@ def escalated_cases_by_agency(request):
         
     if month:
         start, end = get_month(int(month), today.year)
-        
-        messages = messages.filter(date_created__date__range=(start, end))
+        messages = messages.filter(date_created__range=(start, end))
     
     if year:
         messages = messages.filter(date_created__year=year)
         
     if month and year:
         start, end = get_month(int(month), int(year))
-        messages = messages.filter(date_created__date__range=(start, end))
+        messages = messages.filter(date_created__range=(start, end))
         
     if start_date:
         start_of_day, end_of_day = get_start_end_of_day(start_date_str=start_date, end_date_str=today_str)
@@ -593,15 +592,14 @@ def reported_cases_by_issues(request):
         
     if month:
         start, end = get_month(int(month), today.year)
-        
-        messages = messages.filter(date_created__date__range=(start, end))
+        messages = messages.filter(date_created__range=(start, end))
     
     if year:
         messages = messages.filter(date_created__year=year)
         
     if month and year:
         start, end = get_month(int(month), int(year))
-        messages = messages.filter(date_created__date__range=(start, end))
+        messages = messages.filter(date_created__range=(start, end))
         
     if start_date:
         start_of_day, end_of_day = get_start_end_of_day(start_date_str=start_date, end_date_str=today_str)
