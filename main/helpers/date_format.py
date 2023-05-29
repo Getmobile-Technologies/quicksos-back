@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from django.utils import timezone
 
 
@@ -17,3 +17,25 @@ def get_start_end_of_day(start_date_str, end_date_str):
     end_of_day = datetime.combine(target_date, time.max).astimezone(target_tz)
     
     return start_of_day, end_of_day
+
+
+
+def get_month(target_month, target_year):
+    
+    """Returns start and end of a specific month in a year"""
+    
+    # Set the start date to the beginning of the target month
+    start_date = datetime(target_year, target_month, 1).date()
+
+    # Calculate the end date as the beginning of the next month, then subtract one day to get the last day of the target month
+    end_date = (datetime(target_year, target_month + 1, 1) - timedelta(days=1)).date()
+
+    # Set the start of the day for the start date
+    start_of_mth = datetime.combine(start_date, time.min)
+
+    # Set the end of the day for the end date
+    end_of_mth = datetime.combine(end_date, time.max)
+
+  
+    
+    return start_of_mth, end_of_mth
