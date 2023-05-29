@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 
 from main.helpers.date_format import get_month, get_start_end_of_day
-from .serializers import ArchiveSerializer, EmergencyCodeSerializer, EscalateSerializer, AgencySerializer, IssueSerializer, MessageSerializer, QuestionSerializer
+from .serializers import ArchiveSerializer, EmergencyCodeSerializer, EscalateSerializer, AgencySerializer, IssueSerializer, MessageSerializer, MonthlyReportSerializer, QuestionSerializer
 from drf_yasg.utils import swagger_auto_schema
 from .models import Agency, EmergencyCode, Issue, Message, Question, User
 from rest_framework.decorators import permission_classes, authentication_classes
@@ -14,6 +14,8 @@ from accounts.permissions import IsAdmin, IsAdminOrReadOnly, IsAgent, IsAgentOrA
 from django.utils import timezone
 from rest_framework.authentication import TokenAuthentication
 from .helpers.check_agency import validate_responders
+from django.db.models import Count
+from django.db.models.functions import Coalesce
 
 
 @swagger_auto_schema("post", request_body=MessageSerializer())
@@ -786,3 +788,113 @@ def archive_case(request, message_id):
         
         
         
+@api_view(["GET", "POST"])
+def monthly_report(request):
+    
+    if request.method == "GET":
+        today = timezone.now()
+        
+        month_start, month_end = get_month(today.month, today.year)
+        
+    if request.method == "POST":
+        serializer = MonthlyReportSerializer(request.data)
+        
+        month_start, month_end = get_month(serializer.validated_data.get("month"),
+                                           serializer.validated_data.get("year"))
+    data = {}
+    messages = Message.objects.filter(is_active=True, date_created__range=(month_start, 
+                                                                               month_end))
+    
+    data['total_calls'] = messages.filter(provider="call").count()
+    data['total_whatsapp'] = messages.filter(provider="whatsapp").count()
+    data['category'] = {
+        "emergency" : messages.filter(category="emergency"),
+        "non_emergency" : messages.filter(category="non_emergency"),
+        "hoax" : messages.filter(category="hoax"),
+        
+    }
+    
+    agencies = Agency.objects.filter(is_active=True)
+    agency_cases = {agency.acronym: {
+        "resolved":messages.filter(emergency_code__agency=agency,status="completed").count(),
+        "unresolved":messages.filter(emergency_code__agency=agency).exclude(status="completed").count(),
+        "total":messages.filter(emergency_code__agency=agency).count()} for agency in agencies }
+    
+    data["agency_cases"] = agency_cases
+    
+    
+    lga_set = set(Message.objects.filter(is_active=True).values_list("local_gov", flat=True))
+    
+    lga_cases = sorted({lga:messages.filter(local_gov=lga).count() for lga in lga_set})
+    
+    data["cases_by_lga"] = lga_cases
+    
+    
+    issues = Issue.objects.filter(is_active=True)
+    issue_report = {}
+    for issue in issues:
+                
+        issue_report[issue.name] = {lga:messages.filter(incident=issue.id, local_gov=lga).count() for lga in lga_set}
+        
+    data['issue_per_lga'] = issue_report
+    
+    
+    return Response(data, status=status.HTTP_200_OK)
+    
+    
+
+@api_view(["GET", "POST"])
+def month_report(request):
+    if request.method == "GET":
+        today = timezone.now()
+        month_start, month_end = get_month(today.month, today.year)
+    elif request.method == "POST":
+        serializer = MonthlyReportSerializer(request.data)
+        month_start, month_end = get_month(
+            serializer.validated_data.get("month"),
+            serializer.validated_data.get("year")
+        )
+    else:
+        return Response("Invalid request method.", status=status.HTTP_400_BAD_REQUEST)
+
+    data = {}
+    messages = Message.objects.filter(is_active=True, date_created__range=(month_start, month_end))
+
+    data['total_calls'] = messages.filter(provider="call").count()
+    data['total_whatsapp'] = messages.filter(provider="whatsapp").count()
+
+    categories = ['emergency', 'non_emergency', 'hoax']
+    data['category'] = {
+        category: messages.filter(category=category).count()
+        for category in categories
+    }
+
+    agencies = Agency.objects.filter(is_active=True)
+    agency_cases = {
+        agency.acronym: {
+            "resolved": messages.filter(
+                emergency_code__agency=agency, status="completed"
+            ).count(),
+            "unresolved": messages.filter(
+                emergency_code__agency=agency
+            ).exclude(status="completed").count(),
+            "total": messages.filter(emergency_code__agency=agency).count(),
+        }
+        for agency in agencies
+    }
+
+    data["agency_cases"] = agency_cases
+
+    lga_set = messages.values_list("local_gov", flat=True).distinct()
+
+    lga_cases = messages.values("local_gov").annotate(count=Count("local_gov")).order_by("-count")
+    data["cases_by_lga"] = list(lga_cases)
+
+    issues = Issue.objects.filter(is_active=True)
+    issue_report = {
+        issue.name: messages.values("local_gov").annotate(count=Count("local_gov", filter=Coalesce("incident", issue.id))).order_by("-count")
+        for issue in issues
+    }
+    data['issue_per_lga'] = issue_report
+
+    return Response(data, status=status.HTTP_200_OK)

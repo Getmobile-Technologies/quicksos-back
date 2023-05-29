@@ -200,3 +200,8 @@ class EmergencyCodeSerializer(serializers.ModelSerializer):
             
         instance.save()
         return instance
+    
+    
+class MonthlyReportSerializer(serializers.Serializer):
+    month = serializers.IntegerField()
+    year = serializers.IntegerField()
