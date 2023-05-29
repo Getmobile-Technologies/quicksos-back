@@ -508,30 +508,39 @@ def escalated_cases_by_agency(request):
     end_date = request.GET.get("endDate")
 
     
+    today = timezone.now().date()
+    today_str = today.strftime("%Y-%m-%d")
+    
     agencies = Agency.objects.filter(is_active=True)
         
-    # if month or year or start_date or end_date:
-    #     messages = Message.objects.filter(is_active=True)
-    # else:
-    #     today = timezone.now().date()
-    #     messages = Message.objects.filter(is_active=True, date_escalated__date = today)
-        
-    messages = Message.objects.filter(is_active=True)
+   
+
     
+    if month or year or start_date or end_date:
+        messages = Message.objects.filter(is_active=True)
+    else:
+        start_of_day, end_of_day = get_start_end_of_day(start_date_str=today_str, end_date_str=today_str)
+    
+        messages = Message.objects.filter(is_active=True,date_created__range=(start_of_day, end_of_day))
+    
+        
     if local_gov:
         messages = messages.filter(local_gov=local_gov)
         
     if month:
-        messages = messages.filter(date_escalated__month=month)
+        messages = messages.filter(date_created__month=month)
     
     if year:
-        messages = messages.filter(date_escalated__year=year)
+        messages = messages.filter(date_created__year=year)
         
     if start_date:
-        messages = messages.filter(date_created__date__gte=start_date)
+        start_of_day, end_of_day = get_start_end_of_day(start_date_str=start_date, end_date_str=today_str)
     
-    if end_date:
-        messages = messages.filter(date_created__date__lte=end_date)
+        messages = Message.objects.filter(is_active=True,date_created__range=(start_of_day, end_of_day))
+    
+    if start_date and end_date:
+        start_of_day, end_of_day = get_start_end_of_day(start_date_str=start_date, end_date_str=end_date)
+        messages = Message.objects.filter(is_active=True,date_created__range=(start_of_day, end_of_day))
         
     
     escalation_by_agencies = {agency.acronym: messages.filter(emergency_code__agency=agency).count() for agency in agencies }
@@ -560,19 +569,18 @@ def reported_cases_by_issues(request):
     start_date = request.GET.get("startDate")
     end_date = request.GET.get("endDate")
 
+    today = timezone.now().date()
+    today_str = today.strftime("%Y-%m-%d")
     
     issues = Issue.objects.filter(is_active=True)
     
-    # if month or year or start_date or end_date:
-    #     messages = Message.objects.filter(is_active=True)
-    # else:
-    #     today = timezone.now().date()
-
-    #     # messages = Message.objects.all()
-
-    #     messages = Message.objects.filter(is_active=True, date_created__date = today)
+    if month or year or start_date or end_date:
+        messages = Message.objects.filter(is_active=True)
+    else:
+        start_of_day, end_of_day = get_start_end_of_day(start_date_str=today_str, end_date_str=today_str)
     
-    messages = Message.objects.filter(is_active=True)  
+        messages = Message.objects.filter(is_active=True,date_created__range=(start_of_day, end_of_day))
+    
         
     if local_gov:
         messages = messages.filter(local_gov=local_gov)
@@ -584,10 +592,13 @@ def reported_cases_by_issues(request):
         messages = messages.filter(date_created__year=year)
         
     if start_date:
-        messages = messages.filter(date_created__date__gte=start_date)
+        start_of_day, end_of_day = get_start_end_of_day(start_date_str=start_date, end_date_str=today_str)
     
-    if end_date:
-        messages = messages.filter(date_created__date__lte=end_date)
+        messages = Message.objects.filter(is_active=True,date_created__range=(start_of_day, end_of_day))
+    
+    if start_date and end_date:
+        start_of_day, end_of_day = get_start_end_of_day(start_date_str=start_date, end_date_str=end_date)
+        messages = Message.objects.filter(is_active=True,date_created__range=(start_of_day, end_of_day))
         
     
     
