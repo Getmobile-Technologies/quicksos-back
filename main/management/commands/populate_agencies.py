@@ -39,8 +39,8 @@ class Command(BaseCommand):
                 print(row, "\n")
                 
                 responders = list(map(lambda x: Agency.objects.get(acronym=x.strip().rstrip()).id, row['responders'].split(",")))
-                code = row['\ufeffcode'] + " - " + row['incident']
-                # code = row['code'] + " - " + row['incident']
+                # code = row['\ufeffcode'] + " - " + row['incident']
+                code = row['code'] + " - " + row['incident']
                 
                 
                 
