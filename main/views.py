@@ -217,58 +217,76 @@ def agency_detail(request, agency_id):
 @swagger_auto_schema("post", request_body=EscalateSerializer())
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAgent])
+@permission_classes([IsAgent | IsAdmin])
 def escalate(request, message_id):
     try:
         obj = Message.objects.get(id=message_id, is_active=True, status="pending")
-    
-        
     except Message.DoesNotExist:
         errors = {
-                "message":"failed",
-                "errors": f'Message with id {message_id} not found or has been escalated'
-                }
+            "message": "failed",
+            "errors": f'Message with id {message_id} not found or has been escalated'
+        }
         return Response(errors, status=status.HTTP_404_NOT_FOUND)
-    
+
     if request.method == "POST":
-        
         serializer = EscalateSerializer(data=request.data)
-        
         if serializer.is_valid():
-            emergency_code = serializer.validated_data.get('emergency_code')
+            emergency_codes = serializer.validated_data.get('emergency_code')
+            agent_note = serializer.validated_data.get('agent_note')
+            category = serializer.validated_data.get('category')
             
-            #check all the agencies to be escalated to, if any does not have an escalator, raise an error.
-            if validate_responders(emergency_code.agency.all()):
-                    
-                # print(request.user)
+            all_agencies = list(set(agencies for emergency_code in emergency_codes for agencies in emergency_code.agency.all()))
+            
+
+
+            # Check if all the agencies to be escalated to have an escalator
+            if validate_responders(all_agencies):
                 obj.agent = request.user
-                obj.emergency_code = emergency_code
-                obj.status= "escalated"
+                obj.status = "escalated"
                 obj.date_escalated = timezone.now()
-                # obj.local_gov = serializer.validated_data.get('local_gov')
-                obj.agent_note = serializer.validated_data.get('agent_note')
-                
-                obj.category = serializer.validated_data.get('category')
-                
+                obj.agent_note = agent_note
+                obj.category = category
+
+                # We use the set() method to update the ManyToManyField with the new EmergencyCode instances
+                obj.emergency_code.set(emergency_codes)
+
                 obj.save()
-            
-                return Response({"message":"successful"}, status=status.HTTP_201_CREATED)
+
+                return Response({"message": "successful"}, status=status.HTTP_201_CREATED)
+            else:
+                errors = {
+                    "message": "failed",
+                    "errors": "Some of the agencies to be escalated to do not have an escalator."
+                }
+                return Response(errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             errors = {
-                "message":"failed",
-                "errors":serializer.errors
-                }
+                "message": "failed",
+                "errors": serializer.errors
+            }
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+
 
 
 @api_view(["GET"])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsEscalator])
+@permission_classes([IsEscalator | IsAdmin])
 def escalated_message(request):        
     if request.method == "GET":
         date = request.GET.get("filterDate")
+        
+        messages = Message.objects.filter(
+                is_active=True,
+                status="escalated")
+        
+
+        user_agency = request.user.agency
+        
+        messages = messages.filter(emergency_code__in=user_agency.codes.all()
+        )
                 
-        messages = Message.objects.filter(is_active=True, status="escalated",emergency_code__agency=request.user.agency )
         
         if date:
             messages = messages.filter(date_escalated__date=date)
@@ -548,9 +566,13 @@ def escalated_cases_by_agency(request):
     if start_date and end_date:
         start_of_day, end_of_day = get_start_end_of_day(start_date_str=start_date, end_date_str=end_date)
         messages = Message.objects.filter(is_active=True,date_created__range=(start_of_day, end_of_day))
-        
     
-    escalation_by_agencies = {agency.acronym: messages.filter(emergency_code__agency=agency).count() for agency in agencies }
+    
+
+
+
+    escalation_by_agencies = {agency.acronym: messages.filter(emergency_code__in=agency.codes.all()).count() for agency in agencies}
+    
     
     
     data = {
@@ -818,10 +840,16 @@ def monthly_report(request):
     }
     
     agencies = Agency.objects.filter(is_active=True)
-    agency_cases = {agency.acronym: {
-        "resolved":messages.filter(emergency_code__agency=agency,status="completed").count(),
-        "unresolved":messages.filter(emergency_code__agency=agency).exclude(status="completed").count(),
-        "total":messages.filter(emergency_code__agency=agency).count()} for agency in agencies }
+    agency_cases =  {}
+    
+    for agency in agencies:
+        codes = agency.codes.all()
+        agency_cases[agency.acronym]=  {
+        "resolved":messages.filter(emergency_code__in=codes,status="completed").count(),
+        "unresolved":messages.filter(emergency_code__in=codes).exclude(status="completed").count(),
+        "total":messages.filter(emergency_code__in=codes).count()
+        }
+        
     
     data["agency_cases"] = agency_cases
     
