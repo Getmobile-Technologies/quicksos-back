@@ -63,7 +63,7 @@ class MessageSerializer(serializers.ModelSerializer):
         if  data is not None:
             try:
                 incident = Issue.objects.get(id=data)
-                return incident
+                return incident.id
             except Issue.DoesNotExist:
                 raise ValidationError(detail={"incident":"Enter a valid incident id"})
             
