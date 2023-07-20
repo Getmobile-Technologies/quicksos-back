@@ -6,7 +6,7 @@ from accounts.serializers import User
 from config import settings
 from rest_framework import serializers
 from django.template.loader import render_to_string
-from main.models import Message, EmergencyCode
+from main.models import Message, Agency
 from main.helpers.push_notifications import send_push_notification
 from report.models import AssignedCase
 from report.serializers import AssignedCaseSerializer
@@ -51,8 +51,9 @@ def send_notification(sender, instance, created, **kwargs):
         # print(recipient_list)
         # print(instance.password)
         
-        agencies =  instance.emergency_code.all().values_list('agency', flat=True)
-        print(agencies)
+        agency_ids =  instance.emergency_code.all().values_list('agency', flat=True)
+
+        agencies = Agency.objects.filter(uuid__in=agency_ids)
 
         escalator_keys = get_data([agency.members.filter(role="escalator").values_list("firebase_key", flat=True) for agency in agencies]) 
 
