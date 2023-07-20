@@ -6,7 +6,7 @@ from accounts.serializers import User
 from config import settings
 from rest_framework import serializers
 from django.template.loader import render_to_string
-from main.models import Message
+from main.models import Message, EmergencyCode
 from main.helpers.push_notifications import send_push_notification
 from report.models import AssignedCase
 from report.serializers import AssignedCaseSerializer
@@ -28,7 +28,8 @@ def get_data(queryset):
 @receiver(post_save, sender=Message)
 def send_notification(sender, instance, created, **kwargs):
     if instance.status=="escalated":
-#         escalators =[b.members.filter(role="escalator").values_list("email", flat=True) for b in instance.emergency_code.agency.all() if instance.emergency_code] 
+        
+        # escalators =[b.members.filter(role="escalator").values_list("email", flat=True) for b in instance.emergency_code.agency.all() if instance.emergency_code] 
         
 #         subject = f"New Emergency Escalated"
         
@@ -50,10 +51,12 @@ def send_notification(sender, instance, created, **kwargs):
         # print(recipient_list)
         # print(instance.password)
         
-        # escalator_keys =get_data([b.members.filter(role="escalator").values_list("firebase_key", flat=True) for b in instance.emergency_code.agency.all()]) 
+        agencies = [code.agency for code in instance.emergency_code]
         
-        # for key in escalator_keys:
-        #     send_push_notification("escalated", key)
+        escalator_keys =get_data([agency.members.filter(role="escalator").values_list("firebase_key", flat=True) for agency in agencies]) 
+        
+        for key in escalator_keys:
+            send_push_notification("escalated", key)
         
         
         return
