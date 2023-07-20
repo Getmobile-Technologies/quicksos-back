@@ -53,7 +53,7 @@ def send_notification(sender, instance, created, **kwargs):
         
         agency_ids =  instance.emergency_code.all().values_list('agency', flat=True)
 
-        agencies = Agency.objects.filter(uuid__in=agency_ids)
+        agencies = Agency.objects.filter(id__in=agency_ids)
 
         escalator_keys = get_data([agency.members.filter(role="escalator").values_list("firebase_key", flat=True) for agency in agencies]) 
 
