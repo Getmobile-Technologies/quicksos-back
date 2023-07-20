@@ -84,7 +84,10 @@ class Message(models.Model):
     
     @property
     def agency_detail(self):
-        return self.emergency_code.agency.values("acronym")
+        acronyms_set = set()
+        for emergency_code in self.emergency_code.all():
+            acronyms_set.update(emergency_code.agency.values_list("acronym", flat=True))
+        return list(acronyms_set)
     
     def delete(self):
         self.is_active=False
