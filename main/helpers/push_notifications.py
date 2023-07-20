@@ -36,7 +36,6 @@ def send_push_notification(notice_for, user_key):
     
     try:
         response = messaging.send(message)
-        print(response.json())
     except Exception as e:
         print(str(e))
         logging.error(str(e))
