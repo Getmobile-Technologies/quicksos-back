@@ -67,10 +67,10 @@ def send_notification(sender, instance, created, **kwargs):
     
     
 
-# @receiver(post_save, sender=Message)
-# def send_agent_notification(sender, instance, created, **kwargs):
-#     if created:
-#         agents =User.objects.filter(role="agent")
+@receiver(post_save, sender=Message)
+def send_agent_notification(sender, instance, created, **kwargs):
+    if created and instance.provider=="whatsapp":
+        agents =User.objects.filter(role="agent")
         
 #         subject = f"New Emergency Escalated"
         
@@ -91,13 +91,14 @@ def send_notification(sender, instance, created, **kwargs):
         
 #         # print(recipient_list)
 #         # print(instance.password)
-#         agent_keys =agents.values_list("firebase_key", flat=True)
+        agent_keys =agents.values_list("firebase_key", flat=True)
         
-#         for key in agent_keys:
-#             send_push_notification("new_case", key)
+        for key in agent_keys:
+            if key != "":
+                send_push_notification("new_case", key)
         
         
-#         return
+        return
     
     
 @receiver(post_save, sender=AssignedCase)
