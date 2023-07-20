@@ -58,16 +58,6 @@ class MessageSerializer(serializers.ModelSerializer):
         
         return message
     
-    def validate_incident(self, data):
-        
-        if  data is not None:
-            try:
-                incident = Issue.objects.get(id=data)
-                return incident.id
-            except Issue.DoesNotExist:
-                raise ValidationError(detail={"incident":"Enter a valid incident id"})
-            
-        raise ValidationError(detail={"incident":"This field cannot be null"})
 
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
