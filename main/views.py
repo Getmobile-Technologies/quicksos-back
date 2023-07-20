@@ -276,7 +276,7 @@ def escalate(request, message_id):
 
 @api_view(["GET"])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsEscalator | IsAdmin])
+@permission_classes([IsEscalator])
 def escalated_message(request):        
     if request.method == "GET":
         date = request.GET.get("filterDate")
