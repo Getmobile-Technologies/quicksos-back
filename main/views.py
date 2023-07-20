@@ -287,7 +287,7 @@ def escalated_message(request):
         
 
         user_agency = request.user.agency
-        
+        print(user_agency)
         messages = messages.filter(emergency_code__in=user_agency.codes.all()
         )
                 
