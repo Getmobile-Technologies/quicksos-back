@@ -279,7 +279,7 @@ class Staging(Common):
     """
     The in-staging settings.
     """
-    DEBUG = False
+    DEBUG = True
     
     ALLOWED_HOSTS = ['quicksos-api.herokuapp.com']
     # Security
