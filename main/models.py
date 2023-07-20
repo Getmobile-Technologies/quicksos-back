@@ -55,7 +55,7 @@ class Message(models.Model):
     nearest_busstop = models.TextField(null=True,blank=True)
     category = models.CharField(max_length=100, blank=True, null=True, choices=CATEGORY_CHOICES)
     agent = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
-    emergency_code = models.ManyToManyField("main.EmergencyCode", related_name="emergency_codes")
+    emergency_code = models.ManyToManyField("main.EmergencyCode", related_name="emergency_codes", blank=True)
     local_gov = models.CharField(max_length=250, blank=True, null=True)
     agent_note = models.TextField(blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
