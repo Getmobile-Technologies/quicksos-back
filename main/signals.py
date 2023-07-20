@@ -53,8 +53,10 @@ def send_notification(sender, instance, created, **kwargs):
         
         agencies = [code.agency for code in instance.emergency_code.all()]
         
-        escalator_keys =get_data([agency.members.filter(role="escalator").values_list("firebase_key", flat=True) for agency in agencies]) 
-        
+        print(agencies)
+
+        escalator_keys = get_data([agency.members.filter(role="escalator").values_list("firebase_key", flat=True) for agency in agencies]) 
+
         for key in escalator_keys:
             send_push_notification("escalated", key)
         
