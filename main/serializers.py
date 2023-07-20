@@ -30,7 +30,7 @@ class MessageSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         responses = validated_data.pop("responses")
-        emergency_code = validated_data.pop("emergency_code", None)
+        emergency_codes = validated_data.pop("emergency_code", None)
         
         message = Message.objects.create(**validated_data)
         
@@ -49,10 +49,10 @@ class MessageSerializer(serializers.ModelSerializer):
         
         
         #escalaste the case if there an emergence code was issued
-        if emergency_code:
+        if emergency_codes:
             message.status = "escalated"
             message.date_escalated = timezone.now()
-            message.emergency_code = emergency_code
+            message.emergency_code.set(emergency_codes)
             
             message.save()
         
