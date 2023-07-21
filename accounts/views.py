@@ -447,11 +447,11 @@ def change_firebase_key(request):
     
     user = request.user
     serializer = ChangeFirebaseKey(data=request.data)
-    serializer.is_Valid(raise_exception=True)
+    serializer.is_valid(raise_exception=True)
     user.firebase_key = serializer.validated_data.get("firebase_key")
     user.save()
     
-    return Response({}, status=status.HTTP_204_NO_CONTENT)   
+    return Response({"message":"success"}, status=status.HTTP_202_ACCEPTED)   
 
 
 @swagger_auto_schema(methods=['POST'], request_body=AdminResetUserPassword())
