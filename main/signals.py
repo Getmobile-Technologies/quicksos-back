@@ -101,13 +101,13 @@ def send_agent_notification(sender, instance, created, **kwargs):
         return
     
     
-@receiver(post_save, sender=AssignedCase)
-def send_responder_notification(sender,instance, created, **kwargs):
-    if created:
-        send_mobile_notification(instance.responder.id)
+# @receiver(post_save, sender=AssignedCase)
+# def send_responder_notification(sender,instance, created, **kwargs):
+#     if created:
+#         send_mobile_notification(instance.responder.id)
         
         
         
         
-    return
+#     return
     
