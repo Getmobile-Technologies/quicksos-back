@@ -17,9 +17,9 @@ from .helpers.check_agency import validate_responders
 import calendar
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-from xhtml2pdf import pisa
-from bokeh.plotting import figure
-from bokeh.embed import components
+# from xhtml2pdf import pisa
+# from bokeh.plotting import figure
+# from bokeh.embed import components
 
 
 @swagger_auto_schema("post", request_body=MessageSerializer())
