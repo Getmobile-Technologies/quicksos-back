@@ -38,5 +38,5 @@ def get_month(target_month, target_year):
     target_date = timezone.datetime(end_date.year, end_date.month, end_date.day, tzinfo=target_tz)
     end_of_mth = datetime.combine(target_date, time.max).astimezone(target_tz)
 
-  
+
     return start_of_mth, end_of_mth

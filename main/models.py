@@ -43,7 +43,8 @@ class Message(models.Model):
     
     CATEGORY_CHOICES = (("emergency", "Emergency"),
                         ("non_emergency", "Non-Emergency"),
-                        ("hoax", "Hoax"))
+                        ("hoax", "Hoax"),
+                        ("nuisance", "Nuisance"))
     
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)

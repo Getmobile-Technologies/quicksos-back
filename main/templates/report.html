@@ -1,0 +1,191 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Report</title>
+  
+    
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.4.3.min.css" rel="stylesheet" type="text/css">
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.4.3.min.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <section>
+      <div class="sc-hKwDye eYMQVo">
+        <div class="card-header"></div>
+        <div class="card-body">
+          <center>
+            <div style="width: 150px">
+              <img
+                src="main/static/logo.jpg"
+                alt="Lagos Logo"
+                style="width: 100%; height: auto"
+              />
+            </div>
+          </center>
+          <h1 style="text-align: center; font-size: 30px">
+            Emergency Response Centre Report for {{month}} {{year}}
+          </h1>
+          <div style="font-size: 16px">
+            <h2 style="text-align: center; margin-bottom: 3rem">
+              EXECUTIVE SUMMARY
+            </h2>
+            <p>{{month}} {{year}} recorded a total of:</p>
+            <ul>
+              <li>{{data.total_calls}} Offered Call(s).</li>
+              <li>{{data.total_whatsapp}} Whatsapp Call(s).</li>
+              <li>
+                {{data.category.total}} Cases were escalated to the Lagos State
+                Emergency Agencies ({{data.category.emergency}} were Emergency
+                cases while {{data.category.non_emergency}} were Non-Emergency
+                cases)
+              </li>
+              <li>
+                {{data.category.hoax}} of the reported cases were Hoax Cases.
+              </li>
+            </ul>
+          </div>
+          <div class="ant-table-wrapper table-responsive">
+            <div class="ant-spin-nested-loading">
+              <div class="ant-spin-container">
+                <div class="ant-table ant-table-bordered">
+                  <div class="ant-table-container">
+                    <div class="ant-table-content">
+                      <table style="table-layout: auto">
+                        <colgroup></colgroup>
+                        <thead class="ant-table-thead">
+                          <tr>
+                            <th class="ant-table-cell">S/N</th>
+                            <th class="ant-table-cell">AGENCY</th>
+                            <th
+                              class="ant-table-cell"
+                              style="text-align: center"
+                            >
+                              RESOLVED
+                            </th>
+                            <th
+                              class="ant-table-cell"
+                              style="text-align: center"
+                            >
+                              UNRESOLVED
+                            </th>
+                            <th
+                              class="ant-table-cell"
+                              style="text-align: center"
+                            >
+                              TOTAL
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody class="ant-table-tbody">
+                          {% for key, value in data.agency_cases.items %}
+                          <tr class="ant-table-row ant-table-row-level-0">
+                            <td class="ant-table-cell">
+                              {{ forloop.counter }}
+                            </td>
+                            <td class="ant-table-cell">{{ key }}</td>
+                            <td
+                              class="ant-table-cell"
+                              style="text-align: center"
+                            >
+                              {{ value.resolved }}
+                            </td>
+                            <td
+                              class="ant-table-cell"
+                              style="text-align: center"
+                            >
+                              {{ value.unresolved }}
+                            </td>
+                            <td
+                              class="ant-table-cell"
+                              style="text-align: center"
+                            >
+                              {{ value.total }}
+                            </td>
+                          </tr>
+
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 2rem">
+            <h2 style="text-align: center; margin-bottom: 3rem">
+              Total Emergency cases by L.G.A
+            </h2>
+            <div class="ant-table-wrapper table-responsive">
+              <div class="ant-spin-nested-loading">
+                <div class="ant-spin-container">
+                  <div class="ant-table ant-table-bordered">
+                    <div class="ant-table-container">
+                      <div class="ant-table-content">
+                        <table style="table-layout: auto">
+                          <colgroup></colgroup>
+                          <thead class="ant-table-thead">
+                            <tr>
+                              <th class="ant-table-cell">S/N</th>
+                              <th
+                                class="ant-table-cell"
+                                style="text-align: center"
+                              >
+                                Local Government Area
+                              </th>
+                              <th
+                                class="ant-table-cell"
+                                style="text-align: center"
+                              >
+                                Emergency Cases
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody class="ant-table-tbody">
+                            {% for key, value in data.cases_by_lga.items %}
+                            <tr class="ant-table-row ant-table-row-level-0">
+                              <td class="ant-table-cell">
+                                {{forloop.counter}}
+                              </td>
+                              <td
+                                class="ant-table-cell"
+                                style="text-align: center"
+                              >
+                                {{key}}
+                              </td>
+                              <td
+                                class="ant-table-cell"
+                                style="text-align: center"
+                              >
+                                {{value}}
+                              </td>
+                            </tr>
+
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="chart-one">
+            <h1>Serverside Rendering</h1>
+            {{div | safe}}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.3.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.3.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.3.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.4.3.min.js"></script>
+    {{script| safe}}
+  </body>
+</html>
