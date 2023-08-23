@@ -6,7 +6,7 @@ from accounts.serializers import User
 from config import settings
 from rest_framework import serializers
 from django.template.loader import render_to_string
-from main.models import Message
+from main.models import Message, Agency
 from main.helpers.push_notifications import send_push_notification
 from report.models import AssignedCase
 from report.serializers import AssignedCaseSerializer
@@ -28,7 +28,8 @@ def get_data(queryset):
 @receiver(post_save, sender=Message)
 def send_notification(sender, instance, created, **kwargs):
     if instance.status=="escalated":
-#         escalators =[b.members.filter(role="escalator").values_list("email", flat=True) for b in instance.emergency_code.agency.all() if instance.emergency_code] 
+        
+        # escalators =[b.members.filter(role="escalator").values_list("email", flat=True) for b in instance.emergency_code.agency.all() if instance.emergency_code] 
         
 #         subject = f"New Emergency Escalated"
         
@@ -50,10 +51,15 @@ def send_notification(sender, instance, created, **kwargs):
         # print(recipient_list)
         # print(instance.password)
         
-        # escalator_keys =get_data([b.members.filter(role="escalator").values_list("firebase_key", flat=True) for b in instance.emergency_code.agency.all()]) 
-        
-        # for key in escalator_keys:
-        #     send_push_notification("escalated", key)
+        agency_ids =  instance.emergency_code.all().values_list('agency', flat=True)
+
+        agencies = Agency.objects.filter(id__in=agency_ids)
+
+        escalator_keys = get_data([agency.members.filter(role="escalator").values_list("firebase_key", flat=True) for agency in agencies]) 
+
+        for key in escalator_keys:
+            if key != "":
+                send_push_notification("escalated", key)
         
         
         return
@@ -61,10 +67,10 @@ def send_notification(sender, instance, created, **kwargs):
     
     
 
-# @receiver(post_save, sender=Message)
-# def send_agent_notification(sender, instance, created, **kwargs):
-#     if created:
-#         agents =User.objects.filter(role="agent")
+@receiver(post_save, sender=Message)
+def send_agent_notification(sender, instance, created, **kwargs):
+    if created and instance.provider=="whatsapp":
+        agents =User.objects.filter(role="agent")
         
 #         subject = f"New Emergency Escalated"
         
@@ -85,22 +91,23 @@ def send_notification(sender, instance, created, **kwargs):
         
 #         # print(recipient_list)
 #         # print(instance.password)
-#         agent_keys =agents.values_list("firebase_key", flat=True)
+        agent_keys =agents.values_list("firebase_key", flat=True)
         
-#         for key in agent_keys:
-#             send_push_notification("new_case", key)
+        for key in agent_keys:
+            if key != "":
+                send_push_notification("new_case", key)
         
         
-#         return
+        return
     
     
-@receiver(post_save, sender=AssignedCase)
-def send_responder_notification(sender,instance, created, **kwargs):
-    if created:
-        send_mobile_notification(instance.responder.id)
+# @receiver(post_save, sender=AssignedCase)
+# def send_responder_notification(sender,instance, created, **kwargs):
+#     if created:
+#         send_mobile_notification(instance.responder.id)
         
         
         
         
-    return
+#     return
     

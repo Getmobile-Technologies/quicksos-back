@@ -14,8 +14,12 @@ from accounts.permissions import IsAdmin, IsAdminOrReadOnly, IsAgent, IsAgentOrA
 from django.utils import timezone
 from rest_framework.authentication import TokenAuthentication
 from .helpers.check_agency import validate_responders
-from django.db.models import Count
-from django.db.models.functions import Coalesce
+import calendar
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from xhtml2pdf import pisa
+from bokeh.plotting import figure
+from bokeh.embed import components
 
 
 @swagger_auto_schema("post", request_body=MessageSerializer())
@@ -34,8 +38,12 @@ def add_message(request):
         if serializer.is_valid():
     
             if serializer.validated_data.get("provider") == "call":
-                emergency_code = serializer.validated_data.get('emergency_code')
-                if validate_responders(emergency_code.agency.all()):
+                emergency_codes = serializer.validated_data.get('emergency_code')
+                all_agencies = list(set(agencies for emergency_code in emergency_codes for agencies in emergency_code.agency.all()))
+            
+
+
+                if validate_responders(all_agencies):
                     serializer.save()
             else:
     
@@ -217,48 +225,57 @@ def agency_detail(request, agency_id):
 @swagger_auto_schema("post", request_body=EscalateSerializer())
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAgent])
+@permission_classes([IsAgent | IsAdmin])
 def escalate(request, message_id):
     try:
         obj = Message.objects.get(id=message_id, is_active=True, status="pending")
-    
-        
     except Message.DoesNotExist:
         errors = {
-                "message":"failed",
-                "errors": f'Message with id {message_id} not found or has been escalated'
-                }
+            "message": "failed",
+            "errors": f'Message with id {message_id} not found or has been escalated'
+        }
         return Response(errors, status=status.HTTP_404_NOT_FOUND)
-    
+
     if request.method == "POST":
-        
         serializer = EscalateSerializer(data=request.data)
-        
         if serializer.is_valid():
-            emergency_code = serializer.validated_data.get('emergency_code')
+            emergency_codes = serializer.validated_data.get('emergency_code')
+            agent_note = serializer.validated_data.get('agent_note')
+            category = serializer.validated_data.get('category')
             
-            #check all the agencies to be escalated to, if any does not have an escalator, raise an error.
-            if validate_responders(emergency_code.agency.all()):
-                    
-                # print(request.user)
+            all_agencies = list(set(agencies for emergency_code in emergency_codes for agencies in emergency_code.agency.all()))
+            
+
+
+            # Check if all the agencies to be escalated to have an escalator
+            if validate_responders(all_agencies):
                 obj.agent = request.user
-                obj.emergency_code = emergency_code
-                obj.status= "escalated"
+                obj.status = "escalated"
                 obj.date_escalated = timezone.now()
-                # obj.local_gov = serializer.validated_data.get('local_gov')
-                obj.agent_note = serializer.validated_data.get('agent_note')
-                
-                obj.category = serializer.validated_data.get('category')
-                
+                obj.agent_note = agent_note
+                obj.category = category
+
+                # We use the set() method to update the ManyToManyField with the new EmergencyCode instances
+                obj.emergency_code.set(emergency_codes)
+
                 obj.save()
-            
-                return Response({"message":"successful"}, status=status.HTTP_201_CREATED)
+
+                return Response({"message": "successful"}, status=status.HTTP_201_CREATED)
+            else:
+                errors = {
+                    "message": "failed",
+                    "errors": "Some of the agencies to be escalated to do not have an escalator."
+                }
+                return Response(errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             errors = {
-                "message":"failed",
-                "errors":serializer.errors
-                }
+                "message": "failed",
+                "errors": serializer.errors
+            }
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+
 
 
 @api_view(["GET"])
@@ -267,8 +284,17 @@ def escalate(request, message_id):
 def escalated_message(request):        
     if request.method == "GET":
         date = request.GET.get("filterDate")
+        
+        messages = Message.objects.filter(
+                is_active=True,
+                status="escalated")
+        
+
+        user_agency = request.user.agency
+
+        messages = messages.filter(emergency_code__in=user_agency.codes.all()
+        )
                 
-        messages = Message.objects.filter(is_active=True, status="escalated",emergency_code__agency=request.user.agency )
         
         if date:
             messages = messages.filter(date_escalated__date=date)
@@ -548,9 +574,13 @@ def escalated_cases_by_agency(request):
     if start_date and end_date:
         start_of_day, end_of_day = get_start_end_of_day(start_date_str=start_date, end_date_str=end_date)
         messages = Message.objects.filter(is_active=True,date_created__range=(start_of_day, end_of_day))
-        
     
-    escalation_by_agencies = {agency.acronym: messages.filter(emergency_code__agency=agency).count() for agency in agencies }
+    
+
+
+
+    escalation_by_agencies = {agency.acronym: messages.filter(emergency_code__in=agency.codes.all()).count() for agency in agencies}
+    
     
     
     data = {
@@ -814,19 +844,28 @@ def monthly_report(request):
         "emergency" : messages.filter(category="emergency").count(),
         "non_emergency" : messages.filter(category="non_emergency").count(),
         "hoax" : messages.filter(category="hoax").count(),
+        "nuisance":messages.filter(category="nuisance").count()
         
     }
     
     agencies = Agency.objects.filter(is_active=True)
-    agency_cases = {agency.acronym: {
-        "resolved":messages.filter(emergency_code__agency=agency,status="completed").count(),
-        "unresolved":messages.filter(emergency_code__agency=agency).exclude(status="completed").count(),
-        "total":messages.filter(emergency_code__agency=agency).count()} for agency in agencies }
+    agency_cases =  {}
+    
+    for agency in agencies:
+        codes = agency.codes.all()
+        agency_cases[agency.acronym]=  {
+        "resolved":messages.filter(emergency_code__in=codes,status="completed").count(),
+        "unresolved":messages.filter(emergency_code__in=codes).exclude(status="completed").count(),
+        "total":messages.filter(emergency_code__in=codes).count()
+        }
+        
     
     data["agency_cases"] = agency_cases
     
     
     lga_set = set(Message.objects.filter(is_active=True).values_list("local_gov", flat=True))
+    
+    messages = messages.exclude(category="nuisance") #remove all nuisance calls before analysis
     
     lga_cases = {lga:messages.filter(local_gov=lga).count() for lga in lga_set}
 
@@ -844,5 +883,109 @@ def monthly_report(request):
     
     
     return Response(data, status=status.HTTP_200_OK)
+
+
+
+# from django.shortcuts import render
+# # from django.http import HttpResponse
+# # from weasyprint import HTML
+
+# # @swagger_auto_schema(method="post", request_body=MonthlyReportSerializer())
+# # @api_view(["GET", "POST"])
+# # @authentication_classes([JWTAuthentication])
+# # @permission_classes([IsAdmin])
+# def pdf_report(request):
+    
+#     if request.method == "GET":
+#         today = timezone.now()
+        
+#         month_start, month_end = get_month(today.month, today.year)
+        
+#     if request.method == "POST":
+#         serializer = MonthlyReportSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         month_start, month_end = get_month(serializer.validated_data.get("month"),
+#                                            serializer.validated_data.get("year"))
+#     data = {}
+#     messages = Message.objects.filter(is_active=True, date_created__range=(month_start, 
+#                                                                                month_end))
+    
+#     data['total_calls'] = messages.filter(provider="call").count()
+#     data['total_whatsapp'] = messages.filter(provider="whatsapp").count()
+#     data['category'] = {
+#         "emergency" : messages.filter(category="emergency").count(),
+#         "non_emergency" : messages.filter(category="non_emergency").count(),
+#         "hoax" : messages.filter(category="hoax").count(),
+        
+#     }
+#     data['category']['total'] = data['category']['emergency'] + data['category']['non_emergency'] + data['category']['hoax']
+    
+#     agencies = Agency.objects.filter(is_active=True)
+#     agency_cases =  {}
+    
+#     for agency in agencies:
+#         codes = agency.codes.all()
+#         agency_cases[agency.acronym]=  {
+#         "resolved":messages.filter(emergency_code__in=codes,status="completed").count(),
+#         "unresolved":messages.filter(emergency_code__in=codes).exclude(status="completed").count(),
+#         "total":messages.filter(emergency_code__in=codes).count()
+#         }
+        
+    
+#     data["agency_cases"] = agency_cases
+    
+    
+#     lga_set = set(Message.objects.filter(is_active=True).values_list("local_gov", flat=True))
+    
+#     lga_cases = {lga:messages.filter(local_gov=lga).count() for lga in lga_set}
+
+    
+#     data["cases_by_lga"] = dict(sorted(lga_cases.items())) 
+    
+    
+#     issues = Issue.objects.filter(is_active=True)
+#     issue_report = {}
+#     for issue in issues:
+                
+#         issue_report[issue.name] = {lga:messages.filter(incident=issue.id, local_gov=lga).count() for lga in lga_set}
+        
+#     data['issue_per_lga'] = issue_report
+    
+#     #create a plot
+#     plot = figure(plot_width=400, plot_height=400)
+ 
+#     # add a circle renderer with a size, color, and alpha
+    
+#     plot.circle([1, 2, 3, 4, 5], [6, 7, 2, 4, 5], size=20, color="navy", alpha=0.5)
+    
+#     script, div = components(plot)
+    
+#     context = {
+#         'data': data,
+#         "month" : calendar.month_name[month_start.month],
+#         "year" : month_start.year,
+#         'script': script, 
+#         'div': div
+#     }
+
+    
+    
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = f'attachment; filename="{calendar.month_name[month_start.month]}-{month_start.year}-report.pdf"'
+
+#     html = render_to_string("report.html", 
+#                             context)
+
+#     pisa.CreatePDF(html, dest=response)
+
+#     return response 
+
+#     # return render(request,  "report.html", context)
+    
+    
+
+
+    
+    
     
     

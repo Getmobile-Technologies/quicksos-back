@@ -106,6 +106,9 @@ class Common(Configuration):
 
     # Database
     # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+    # DATABASES = values.DatabaseURLValue(
+    #     "postgres://dbmswbluclhria:b0169952a779efd1751ebd35f4911b3bdf5777a08df2763bc5e7579582044212@ec2-54-160-109-68.compute-1.amazonaws.com:5432/d3gj297e8su9mp"
+    # )
     DATABASES = values.DatabaseURLValue(
         'sqlite:///{}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
     )
@@ -203,56 +206,56 @@ class Common(Configuration):
         api_secret = os.getenv('CLOUD_API_SECRET')
     )
     
-    # Configure the logging settings
-    LOG_DIR = os.path.join(BASE_DIR, 'logs')
+    # # Configure the logging settings
+    # LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
-    # Ensure the logs directory exists
-    if not os.path.exists(LOG_DIR):
-        os.makedirs(LOG_DIR)
+    # # Ensure the logs directory exists
+    # if not os.path.exists(LOG_DIR):
+    #     os.makedirs(LOG_DIR)
 
-    # Logging configuration for errors
-    LOG_FILE_ERROR = os.path.join(LOG_DIR, 'error.log')
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'error_file': {
-                'level': 'ERROR',
-                'class': 'logging.FileHandler',
-                'filename': LOG_FILE_ERROR,
-                'formatter': 'verbose',
-            },
-        },
-        'loggers': {
-            'django': {
-                'handlers': ['error_file'],
-                'level': 'ERROR',
-                'propagate': True,
-            },
-        },
-    }
+    # # Logging configuration for errors
+    # LOG_FILE_ERROR = os.path.join(LOG_DIR, 'error.log')
+    # LOGGING = {
+    #     'version': 1,
+    #     'disable_existing_loggers': False,
+    #     'handlers': {
+    #         'error_file': {
+    #             'level': 'ERROR',
+    #             'class': 'logging.FileHandler',
+    #             'filename': LOG_FILE_ERROR,
+    #             'formatter': 'verbose',
+    #         },
+    #     },
+    #     'loggers': {
+    #         'django': {
+    #             'handlers': ['error_file'],
+    #             'level': 'ERROR',
+    #             'propagate': True,
+    #         },
+    #     },
+    # }
 
-    # Logging configuration for server prints
-    LOG_FILE_SERVER = os.path.join(LOG_DIR, 'server.log')
-    LOGGING['handlers']['server_file'] = {
-        'level': 'INFO',
-        'class': 'logging.FileHandler',
-        'filename': LOG_FILE_SERVER,
-        'formatter': 'verbose',
-    }
-    LOGGING['loggers']['django.server'] = {
-        'handlers': ['server_file'],
-        'level': 'INFO',
-        'propagate': False,
-    }
+    # # Logging configuration for server prints
+    # LOG_FILE_SERVER = os.path.join(LOG_DIR, 'server.log')
+    # LOGGING['handlers']['server_file'] = {
+    #     'level': 'INFO',
+    #     'class': 'logging.FileHandler',
+    #     'filename': LOG_FILE_SERVER,
+    #     'formatter': 'verbose',
+    # }
+    # LOGGING['loggers']['django.server'] = {
+    #     'handlers': ['server_file'],
+    #     'level': 'INFO',
+    #     'propagate': False,
+    # }
 
-    # Logging formatter
-    LOGGING['formatters'] = {
-        'verbose': {
-            'format': '%(asctime)s [%(levelname)s] %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S',
-        },
-    }
+    # # Logging formatter
+    # LOGGING['formatters'] = {
+    #     'verbose': {
+    #         'format': '%(asctime)s [%(levelname)s] %(message)s',
+    #         'datefmt': '%Y-%m-%d %H:%M:%S',
+    #     },
+    # }
 
         
     
@@ -275,11 +278,12 @@ class Development(Common):
     ]
 
 
+
 class Staging(Common):
     """
     The in-staging settings.
     """
-    DEBUG = False
+    DEBUG = True
     
     ALLOWED_HOSTS = ['quicksos-api.herokuapp.com']
     # Security

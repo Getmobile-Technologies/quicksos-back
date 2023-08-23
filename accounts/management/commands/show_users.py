@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand, CommandError
-from ...models import Agency, Issue, Question
 import json
 from django.contrib.auth import get_user_model
 
@@ -11,4 +10,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         users = User.objects.all()
         for i in users:
-            print(i.email, i.role)
+            print(i.get_username(), i.role)

@@ -43,7 +43,8 @@ class Message(models.Model):
     
     CATEGORY_CHOICES = (("emergency", "Emergency"),
                         ("non_emergency", "Non-Emergency"),
-                        ("hoax", "Hoax"))
+                        ("hoax", "Hoax"),
+                        ("nuisance", "Nuisance"))
     
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -52,15 +53,17 @@ class Message(models.Model):
     status = models.CharField(max_length=300, default="pending", choices=STATUS)
     landmark = models.CharField(max_length=300, null=True, blank=True)
     address = models.TextField(null=True,blank=True)
+    nearest_busstop = models.TextField(null=True,blank=True)
     category = models.CharField(max_length=100, blank=True, null=True, choices=CATEGORY_CHOICES)
     agent = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
-    emergency_code = models.ForeignKey("main.EmergencyCode", related_name="emergency_codes", blank=True, on_delete=models.CASCADE, null=True)
+    emergency_code = models.ManyToManyField("main.EmergencyCode", related_name="emergency_codes", blank=True)
     local_gov = models.CharField(max_length=250, blank=True, null=True)
     agent_note = models.TextField(blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_escalated = models.DateTimeField(null=True, blank=True)
     provider = models.CharField(max_length=255, default="whatsapp", choices=PROVIDERS)
     archive_reason = models.TextField(blank=True, null=True)
+    traffic_situation = models.TextField(blank=True, null=True)
     date_archived = models.DateTimeField(null=True, blank=True)
     is_active=models.BooleanField(default=True)
     incident = models.ForeignKey("main.Issue", null=True, blank=True, related_name="cases", on_delete=models.CASCADE)
@@ -82,7 +85,10 @@ class Message(models.Model):
     
     @property
     def agency_detail(self):
-        return self.emergency_code.agency.values("acronym")
+        acronyms_set = set()
+        for emergency_code in self.emergency_code.all():
+            acronyms_set.update(emergency_code.agency.values_list("acronym", flat=True))
+        return list(acronyms_set)
     
     def delete(self):
         self.is_active=False
