@@ -49,7 +49,7 @@ class MessageSerializer(serializers.ModelSerializer):
         
         
         #escalaste the case if there an emergence code was issued
-        if emergency_codes:
+        if emergency_codes is not None:
             message.status = "escalated"
             message.date_escalated = timezone.now()
             message.emergency_code.set(emergency_codes)
