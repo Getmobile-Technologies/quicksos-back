@@ -285,7 +285,7 @@ class Staging(Common):
     """
     DEBUG = True
     
-    ALLOWED_HOSTS = ['quicksos-api.herokuapp.com']
+    ALLOWED_HOSTS = ['quicksos-api.herokuapp.com', "quicksos-c4fefc0c9d3e.herokuapp.com"]
     # Security
     SESSION_COOKIE_SECURE = values.BooleanValue(True)
     SECURE_BROWSER_XSS_FILTER = values.BooleanValue(True)
@@ -305,6 +305,7 @@ class Staging(Common):
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
     EMAIL_PORT = 465
     EMAIL_USE_TLS = True 
+    
 
 class Production(Staging):
     """
