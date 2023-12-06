@@ -106,9 +106,7 @@ class Common(Configuration):
 
     # Database
     # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-    # DATABASES = values.DatabaseURLValue(
-    #     "postgres://dbmswbluclhria:b0169952a779efd1751ebd35f4911b3bdf5777a08df2763bc5e7579582044212@ec2-54-160-109-68.compute-1.amazonaws.com:5432/d3gj297e8su9mp"
-    # )
+    
     DATABASES = values.DatabaseURLValue(
         'sqlite:///{}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
     )
