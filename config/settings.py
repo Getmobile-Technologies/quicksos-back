@@ -309,7 +309,7 @@ class Production(Staging):
 
     DEBUG = False
     
-    ALLOWED_HOSTS = ['41.75.89.118', 'back.lasercrm.com']
+    ALLOWED_HOSTS = ['41.75.89.118', 'back.lasercrm.com', "64.227.96.242"]
 
     DATABASES = {  
         'default': {  
