@@ -87,7 +87,6 @@ pyphen==0.14.0
 python-bidi==0.4.2
 python-dateutil==2.8.2
 python-dotenv==0.19.2
-python-firebase==1.2.1
 python-jwt==3.3.3
 python3-openid==3.2.0
 pytz==2021.1
