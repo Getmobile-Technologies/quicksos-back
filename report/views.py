@@ -28,7 +28,9 @@ def assign(request):
             message.status = "assigned"
             message.save()
             
-            serializer.save()
+            instance = serializer.save()
+            instance.escalator = request.user
+            instance.save()
             
             data = {
                 "message":"success"

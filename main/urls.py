@@ -21,9 +21,12 @@ urlpatterns = [
     path("dashboard/escalated_cases_by_agency/", views.escalated_cases_by_agency),
     path("dashboard/reported_cases_by_issues/", views.reported_cases_by_issues),
     path("dashboard/monthly-report/", views.monthly_report),
+    # path("dashboard/pdf_report/", views.pdf_report),
     path("dashboard/", views.dashboard),
     path("emergency_codes/", views.emergency_codes),
     path("emergency_codes/<uuid:code_id>/", views.emergency_code_detail),
+
+
 
     
     
