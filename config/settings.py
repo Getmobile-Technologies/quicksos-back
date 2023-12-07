@@ -311,7 +311,7 @@ class Production(Staging):
     The in-production settings.
     """
 
-    DEBUG = False
+    DEBUG = True
     
     ALLOWED_HOSTS = ['41.75.89.118', 'back.lasercrm.com', "64.227.96.242"]
 
