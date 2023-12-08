@@ -18,6 +18,9 @@ class AssignedCase(models.Model):
     responded = models.BooleanField(default=False)
     arrived = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
+    responded_at = models.DateTimeField(null=True)
+    arrived_at = models.DateTimeField(null=True)
+    completed_at = models.DateTimeField(null=True)
     is_active=models.BooleanField(default=True)
     
     
@@ -81,6 +84,7 @@ class RequestSupport(models.Model):
     case = models.ForeignKey("main.Message", on_delete=models.CASCADE, related_name="requested_support")
     sender = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="requested_support", null=True, blank=True)
     assignment = models.ForeignKey(AssignedCase, on_delete=models.CASCADE, related_name="requested_support")
+    comment = models.TextField(null=True)
     agencies = models.ManyToManyField('main.Agency', related_name="requested_support")
     status = models.CharField(max_length=250, default="pending")
     date_created = models.DateTimeField(auto_now_add=True)

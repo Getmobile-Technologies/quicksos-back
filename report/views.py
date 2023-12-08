@@ -92,6 +92,7 @@ def respond(request, assigned_case_id):
         if obj.responded==False:
             obj.status="responded"
             obj.responded=True
+            obj.responded_at = timezone.now()
             obj.save()
             return Response({"message":"successful"}, status=status.HTTP_202_ACCEPTED)
         else:
@@ -116,6 +117,7 @@ def has_arrived(request, assigned_case_id):
         if obj.arrived==False:
             obj.status="arrived"
             obj.arrived=True
+            obj.arrived_at=timezone.now()
             obj.save()
             return Response({"message":"successful"}, status=status.HTTP_202_ACCEPTED)
         else:
@@ -180,6 +182,7 @@ def add_report(request, assigned_case_id):
             
            
             obj.status = "complete"
+            obj.completed_at = timezone.now()
             obj.save()
             
             if request.user.agency.acronym == "LASEMA": #TODO: add field to distinguish supervising agency in the agency DB
