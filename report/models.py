@@ -36,7 +36,9 @@ class AssignedCase(models.Model):
     
     @property
     def case_detail(self):
-        return model_to_dict(self.case, exclude="agencies")
+        data = model_to_dict(self.case, exclude=["agencies", "emergency_code"])
+        data["id"] = self.case.id
+        return data
     
     @property
     def issue(self):
