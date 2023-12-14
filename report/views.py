@@ -81,6 +81,26 @@ def assigned_cases(request):
         return Response(data, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsResponder])
+def report_history(request):
+    if request.method=="GET":
+
+       
+        obj = AssignedCase.objects.filter(responder=request.user, is_active=True).filter(status="complete")
+
+        serializer = AssignedCaseSerializer(obj, many=True)
+        
+        
+        data = {
+            "message":"success",
+            'data' : serializer.data
+            }
+        
+        return Response(data, status=status.HTTP_200_OK)
+    
+
 
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
