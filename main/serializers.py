@@ -44,7 +44,7 @@ class MessageSerializer(serializers.ModelSerializer):
             answer = Answer(**response, message=message, question=question)
             ans.append(answer) 
         else:
-            message.incident = question.issue
+            message.incident = question_obj.issue
             message.save()
             Answer.objects.bulk_create(ans)   
             
