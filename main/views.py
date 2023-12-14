@@ -44,7 +44,9 @@ def add_message(request):
 
 
                 if validate_responders(all_agencies):
-                    serializer.save()
+                    message = serializer.save()
+                    message.agent = request.user
+                    message.save()
             else:
     
                 serializer.save()
