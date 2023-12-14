@@ -40,10 +40,12 @@ class MessageSerializer(serializers.ModelSerializer):
         for response in responses: 
             question_obj = response.pop('question')
             question = question_obj.question 
-             
+            
             answer = Answer(**response, message=message, question=question)
             ans.append(answer) 
         else:
+            message.incident = question.issue
+            message.save()
             Answer.objects.bulk_create(ans)   
             
         
