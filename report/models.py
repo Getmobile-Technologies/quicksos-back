@@ -42,7 +42,7 @@ class AssignedCase(models.Model):
     
     @property
     def issue(self):
-        return self.case.answers.all().first().question.issue.name
+        # return self.case.answers.all().first().question.issue.name
         if self.case.issue:
             return self.case.issue.name
         return ""
