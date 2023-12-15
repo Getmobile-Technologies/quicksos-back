@@ -12,7 +12,7 @@ class Command(BaseCommand):
         messages = Message.objects.all()
         
         for message in messages:
-            quest = messages.answers.all().first().question
+            quest = message.answers.all().first().question
             issue = Question.objects.filter(question__icontains = quest).first().issue
             message.incident = issue
             message.save()
